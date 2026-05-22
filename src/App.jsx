@@ -5,8 +5,10 @@ import Philosophy from './components/Philosophy';
 import WeeklySpotlight from './components/WeeklySpotlight';
 import Collection from './components/Collection';
 import Gallery from './components/Gallery';
+import JoinForm from './components/JoinForm';
 import Footer from './components/Footer';
 import AdminPanel from './components/AdminPanel';
+import JengaTopple from './components/JengaTopple';
 
 // Import original games list (used by WeeklySpotlight to resolve featured titles)
 import gamesData from './data/board_games.json';
@@ -20,6 +22,11 @@ const DEFAULT_SCHEDULE = {
 };
 
 export default function App() {
+  // Easter Egg & Admin States
+  const [isGamingMode, setIsGamingMode] = useState(false);
+  const [isJengaActive, setIsJengaActive] = useState(false);
+  const [isAdminOpen, setIsAdminOpen] = useState(false);
+
   // Admin-added games (stored in localStorage, separate from base JSON)
   const [extraGames, setExtraGames] = useState(() => {
     try {
@@ -35,8 +42,63 @@ export default function App() {
       return stored ? JSON.parse(stored) : DEFAULT_SCHEDULE;
     } catch { return DEFAULT_SCHEDULE; }
   });
-  
-  const [isAdminOpen, setIsAdminOpen] = useState(false);
+
+  // Global Konami Code Event Listener
+  useEffect(() => {
+    const konamiCode = [
+      'arrowup', 'arrowup', 'arrowdown', 'arrowdown',
+      'arrowleft', 'arrowright', 'arrowleft', 'arrowright',
+      'b', 'a'
+    ];
+    let inputSequence = [];
+
+    const handleKeyDown = (e) => {
+      // Avoid firing when user is typing in forms/inputs
+      if (
+        document.activeElement.tagName === 'INPUT' ||
+        document.activeElement.tagName === 'TEXTAREA' ||
+        document.activeElement.isContentEditable
+      ) {
+        return;
+      }
+
+      const key = e.key.toLowerCase();
+      inputSequence.push(key);
+      
+      // Keep only the last N keystrokes
+      inputSequence = inputSequence.slice(-konamiCode.length);
+      
+      if (JSON.stringify(inputSequence) === JSON.stringify(konamiCode)) {
+        setIsGamingMode(true);
+        inputSequence = [];
+        
+        // Trigger a premium lounge entry toast notification
+        const alertToast = document.createElement('div');
+        alertToast.className = 'fixed bottom-10 left-1/2 -translate-x-1/2 z-50 py-4 px-8 bg-gradient-to-r from-[#f8b146] to-[#f28a75] text-[#3a1d42] font-mono text-[10px] uppercase tracking-widest font-black rounded-full shadow-[0_0_35px_rgba(248,177,70,0.55)] border border-white/20 select-none animate-bounce';
+        alertToast.innerHTML = 'Midnight Neon Lounge Mode Activated 🌌';
+        document.body.appendChild(alertToast);
+        
+        setTimeout(() => {
+          alertToast.style.opacity = '0';
+          alertToast.style.transition = 'opacity 1s ease-out';
+          setTimeout(() => alertToast.remove(), 1000);
+        }, 4000);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  // Auto reset gaming lounge after 10s
+  useEffect(() => {
+    if (isGamingMode) {
+      const timer = setTimeout(() => {
+        setIsGamingMode(false);
+      }, 10000);
+      return () => clearTimeout(timer);
+    }
+  }, [isGamingMode]);
 
   // Extra gallery images (stored in localStorage)
   const [extraGalleryImages, setExtraGalleryImages] = useState(() => {
@@ -85,25 +147,17 @@ export default function App() {
   };
 
   return (
-    <div className="relative min-h-screen bg-obsidian text-ivory select-none overflow-hidden">
-      {/* Global Texture (Noise Overlay) — z-30 so it doesn't block clicks */}
-      <div className="pointer-events-none fixed inset-0 z-30 opacity-[0.04] mix-blend-overlay">
-        <svg className="h-full w-full" xmlns="http://www.w3.org/2000/svg">
-          <filter id="noise">
-            <feTurbulence 
-              type="fractalNoise" 
-              baseFrequency="0.8" 
-              numOctaves="3" 
-              stitchTiles="stitch" 
-            />
-            <feColorMatrix 
-              type="matrix" 
-              values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.07 0" 
-            />
-          </filter>
-          <rect width="100%" height="100%" filter="url(#noise)" />
-        </svg>
-      </div>
+    <div className={`relative min-h-screen bg-[#4a2b53] bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))] from-[#643b6e] via-[#4a2b53] to-[#1d0a21] text-[#FDFBFF] selection:bg-[#f8b146]/20 selection:text-white select-none overflow-x-hidden ${isGamingMode ? 'gaming-mode' : ''}`}>
+      {/* Dynamic Ambient Spotlight Glows */}
+      <div className={`absolute top-0 right-0 w-[600px] h-[600px] rounded-full filter blur-[150px] pointer-events-none z-0 transition-all duration-[1.2s] ${
+        isGamingMode ? 'bg-indigo-500/15' : 'bg-[#f8b146]/8'
+      }`} />
+      <div className={`absolute top-[25%] left-[-10%] w-[700px] h-[700px] rounded-full filter blur-[160px] pointer-events-none z-0 transition-all duration-[1.2s] ${
+        isGamingMode ? 'bg-[#f8b146]/10' : 'bg-[#f28a75]/8'
+      }`} />
+      <div className={`absolute bottom-[20%] right-[-10%] w-[600px] h-[600px] rounded-full filter blur-[140px] pointer-events-none z-0 transition-all duration-[1.2s] ${
+        isGamingMode ? 'bg-purple-600/10' : 'bg-[#f8b146]/5'
+      }`} />
 
       {/* Floating Island Navigation */}
       <Navbar onOpenAdmin={() => setIsAdminOpen(true)} />
@@ -128,10 +182,16 @@ export default function App() {
 
         {/* Captured Moments (Gallery) */}
         <Gallery extraImages={extraGalleryImages} />
+
+        {/* Membership Admission & Vetted Onboarding Form */}
+        <JoinForm />
       </main>
 
       {/* The Rounded Obsidian Footer */}
-      <Footer />
+      <Footer onTriggerJenga={() => setIsJengaActive(true)} />
+
+      {/* Jenga Easter Egg Component */}
+      <JengaTopple isOpen={isJengaActive} onClose={() => setIsJengaActive(false)} />
 
       {/* Admin Control Panel (hidden, opened via secret logo clicks) */}
       <AdminPanel 

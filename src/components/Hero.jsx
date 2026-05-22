@@ -63,7 +63,7 @@ export default function Hero() {
   return (
     <section
       ref={containerRef}
-      className="relative w-full h-[100dvh] min-h-[600px] overflow-hidden flex items-end justify-start bg-obsidian"
+      className="relative w-full h-[100dvh] min-h-[600px] overflow-hidden flex items-end justify-start bg-[#4a2b53]"
     >
       {/* Background Image Container */}
       <div className="absolute inset-0 w-full h-full overflow-hidden">
@@ -71,9 +71,9 @@ export default function Hero() {
           className="hero-bg-zoom absolute inset-0 w-full h-full bg-cover bg-center"
           style={{ backgroundImage: `url('/assets/images/hero-bg.jpeg')` }}
         />
-        {/* Cinematic Vignette & Bottom Obsidian Gradient */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0D0D12] via-[#0D0D12]/80 to-transparent z-10" />
-        <div className="absolute inset-0 bg-radial-gradient z-10 opacity-60 pointer-events-none" />
+        {/* Cinematic Vignette & Bottom White Gradient */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#4a2b53] via-[#4a2b53]/40 to-transparent z-10" />
+        <div className="absolute inset-0 bg-radial-gradient z-10 opacity-40 pointer-events-none" />
       </div>
 
       {/* Hero Content - Occupies Bottom-Left Third */}
@@ -82,20 +82,20 @@ export default function Hero() {
         {/* Subtle Badge */}
         <div 
           ref={title1Ref} 
-          className="flex items-center gap-2 mb-4 px-3 py-1.5 rounded-full border border-champagne/30 bg-obsidian/60 backdrop-blur-md"
+          className="flex items-center gap-2 mb-4 px-3 py-1.5 rounded-full border border-gold-logo/30 bg-[#3a1d42]/60 backdrop-blur-md"
         >
-          <span className="w-1.5 h-1.5 rounded-full bg-champagne animate-pulse" />
-          <span className="font-mono text-[10px] tracking-[0.25em] text-champagne uppercase font-bold">
+          <span className="w-1.5 h-1.5 rounded-full bg-gold-logo animate-pulse" />
+          <span className="font-mono text-[10px] tracking-[0.25em] text-gold-logo uppercase font-bold">
             Private Atelier
           </span>
         </div>
 
         {/* Cinematic Asymmetric Typography */}
-        <h1 className="font-sans font-black text-4xl sm:text-6xl md:text-8xl tracking-tight leading-[0.95] text-ivory text-left max-w-4xl">
+        <h1 className="font-sans font-black text-4xl sm:text-6xl md:text-8xl tracking-tight leading-[0.95] text-white text-left max-w-4xl">
           <div ref={title2Ref} className="block overflow-hidden pb-1">
             THE PREMIER BOARD GAME
           </div>
-          <div ref={title3Ref} className="font-serif italic font-light text-champagne block mt-2 text-shadow-premium">
+          <div ref={title3Ref} className="font-serif italic font-light text-transparent bg-gradient-to-r from-[#f8b146] to-[#f28a75] bg-clip-text block mt-2 text-shadow-premium">
             Experience.
           </div>
         </h1>
@@ -103,7 +103,7 @@ export default function Hero() {
         {/* Description Copy */}
         <p
           ref={descRef}
-          className="mt-6 font-sans text-base md:text-lg text-ivory/70 max-w-xl text-left font-light leading-relaxed"
+          className="mt-6 font-sans text-base md:text-lg text-[#C8B1CC] max-w-xl text-left font-light leading-relaxed"
         >
           Every Thursday & Friday night at Cortina.D Cafe, Irbid. 
           A curated private members' gathering dedicated to deep strategic gameplay, 
@@ -113,29 +113,29 @@ export default function Hero() {
         {/* Live Quick Info Panel */}
         <div 
           ref={statsRef}
-          className="mt-8 flex flex-wrap gap-x-8 gap-y-4 py-6 border-t border-b border-ivory/10 w-full max-w-xl"
+          className="mt-8 flex flex-wrap gap-x-8 gap-y-4 py-6 border-t border-b border-white/10 w-full max-w-xl"
         >
           <div className="flex items-center gap-3">
-            <Calendar size={18} className="text-champagne" />
+            <Calendar size={18} className="text-gold-logo" />
             <div>
-              <p className="font-mono text-[9px] uppercase tracking-wider text-ivory/40">Schedule</p>
-              <p className="font-sans text-xs font-semibold text-ivory">Thu & Fri @ 7:30 PM</p>
+              <p className="font-mono text-[9px] uppercase tracking-wider text-[#C8B1CC]/60">Schedule</p>
+              <p className="font-sans text-xs font-semibold text-white">Thu & Fri @ 7:30 PM</p>
             </div>
           </div>
 
           <div className="flex items-center gap-3">
-            <Users size={18} className="text-champagne" />
+            <Users size={18} className="text-gold-logo" />
             <div>
-              <p className="font-mono text-[9px] uppercase tracking-wider text-ivory/40">Gathering Size</p>
-              <p className="font-sans text-xs font-semibold text-ivory">80+ Active Members</p>
+              <p className="font-mono text-[9px] uppercase tracking-wider text-[#C8B1CC]/60">Gathering Size</p>
+              <p className="font-sans text-xs font-semibold text-white">80+ Active Members</p>
             </div>
           </div>
 
           <div className="flex items-center gap-3">
-            <Target size={18} className="text-champagne" />
+            <Target size={18} className="text-gold-logo" />
             <div>
-              <p className="font-mono text-[9px] uppercase tracking-wider text-ivory/40">Location</p>
-              <p className="font-sans text-xs font-semibold text-ivory">Cortina.D Cafe</p>
+              <p className="font-mono text-[9px] uppercase tracking-wider text-[#C8B1CC]/60">Location</p>
+              <p className="font-sans text-xs font-semibold text-white">Cortina.D Cafe</p>
             </div>
           </div>
         </div>
@@ -144,12 +144,9 @@ export default function Hero() {
         <div ref={ctaRef} className="mt-10 flex items-center gap-4">
           <button
             onClick={scrollToCollection}
-            className="group relative px-8 py-4 bg-[#0D0D12] border border-[#C9A84C]/30 rounded-full font-sans font-bold text-xs uppercase tracking-widest shadow-xl shadow-champagne/5 hover:scale-[1.03] hover:shadow-[0_0_25px_rgba(201,168,76,0.3)] hover:border-[#C9A84C] transition-all duration-500 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] overflow-hidden"
+            className="group relative px-8 py-4 bg-gradient-to-r from-[#f8b146] to-[#f28a75] text-[#3a1d42] font-sans font-black text-xs uppercase tracking-widest rounded-full shadow-xl shadow-[#f8b146]/15 hover:scale-[1.05] hover:shadow-[0_0_35px_rgba(248,177,70,0.3)] animate-float transition-all duration-300 ease-out cursor-pointer"
           >
-            <span className="absolute inset-0 bg-gradient-to-r from-[#C9A84C]/10 to-[#E3CD89]/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-            <span className="relative z-10 bg-clip-text text-transparent bg-gradient-to-r from-[#C9A84C] to-[#E3CD89]">
-              Explore Collection
-            </span>
+            Explore Collection
           </button>
           
           <button
@@ -157,7 +154,7 @@ export default function Hero() {
               const el = document.getElementById('about');
               if (el) el.scrollIntoView({ behavior: 'smooth' });
             }}
-            className="lift-link px-6 py-4 border border-ivory/20 hover:border-champagne/40 bg-transparent text-ivory font-sans font-medium text-xs uppercase tracking-widest rounded-full transition-colors duration-300"
+            className="lift-link px-6 py-4 border border-white/10 hover:border-[#f8b146]/45 bg-transparent text-white font-sans font-semibold text-xs uppercase tracking-widest rounded-full transition-all duration-300 cursor-pointer"
           >
             Our Philosophy
           </button>
@@ -169,10 +166,10 @@ export default function Hero() {
         onClick={scrollToCollection}
         className="absolute bottom-8 right-12 z-20 hidden md:flex flex-col items-center gap-2 cursor-pointer group"
       >
-        <span className="font-mono text-[9px] uppercase tracking-[0.25em] text-ivory/40 group-hover:text-champagne transition-colors duration-300">
+        <span className="font-mono text-[9px] uppercase tracking-[0.25em] text-white/40 group-hover:text-gold-logo transition-colors duration-300">
           Scroll
         </span>
-        <ChevronDown size={16} className="text-ivory/40 animate-bounce group-hover:text-champagne transition-colors duration-300" />
+        <ChevronDown size={16} className="text-white/40 animate-bounce group-hover:text-gold-logo transition-colors duration-300" />
       </div>
     </section>
   );

@@ -1,37 +1,78 @@
 @import "tailwindcss";
 
 @theme {
-  --color-obsidian: #0D0D12;
-  --color-champagne: #C9A84C;
-  --color-ivory: #FAF8F5;
-  --color-slate-text: #2A2A35;
+  --color-obsidian: #111115;
+  --color-champagne: #f8b146;
+  --color-gold-logo: #f8b146;
+  --color-sunset-start: #f8b146;
+  --color-sunset-end: #f28a75;
+  --color-primary-plum: #4a2b53;
+  --color-ivory: #FDFBFF;
+  --color-slate-text: #C8B1CC;
+  --color-surface-card: rgba(58, 29, 66, 0.45);
 
   --font-sans: 'Inter', sans-serif;
   --font-serif: "Playfair Display", serif;
   --font-mono: "JetBrains Mono", monospace;
 
   --radius-container: 2.5rem;
+
+  --animate-float: float 4s ease-in-out infinite;
+  --animate-pulse-gold: pulseGold 3s ease-in-out infinite;
+
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-8px);
+    }
+  }
+
+  @keyframes pulseGold {
+    0%, 100% {
+      box-shadow: 0 0 15px rgba(248, 177, 70, 0.15);
+      border-color: rgba(248, 177, 70, 0.2);
+    }
+    50% {
+      box-shadow: 0 0 28px rgba(248, 177, 70, 0.35);
+      border-color: rgba(242, 138, 117, 0.5);
+    }
+  }
 }
 
 @layer base {
   html {
     scroll-behavior: smooth;
-    background-color: #0D0D12;
+    background-color: #4a2b53;
     font-family: 'Inter', sans-serif;
   }
 
   body {
-    background-color: #0D0D12;
-    color: #FAF8F5;
+    background-color: #4a2b53;
+    color: #FDFBFF;
     margin: 0;
     padding: 0;
     min-height: 100vh;
   }
 }
 
+/* Global grain overlay for texture */
+.grain-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
 /* Premium text shadow utility */
 .text-shadow-premium {
-  text-shadow: 0 4px 12px rgba(0, 0, 0, 0.8), 0 2px 4px rgba(0, 0, 0, 0.6);
+  text-shadow: 0 2px 10px rgba(248, 177, 70, 0.2);
 }
 
 /* Custom Premium Scrollbar */
@@ -41,48 +82,49 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: #0D0D12;
+  background: #3a1d42;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #2A2A35;
+  background: rgba(248, 177, 70, 0.25);
   border-radius: 4px;
-  border: 2px solid #0D0D12;
+  border: 2px solid #3a1d42;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #C9A84C;
+  background: #f8b146;
 }
 
 /* Glassmorphism details */
 .glass-pill {
-  background: rgba(13, 13, 18, 0.4);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(201, 168, 76, 0.15);
+  background: rgba(58, 29, 66, 0.65);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.glass-pill-light {
-  background: rgba(250, 248, 245, 0.7);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(201, 168, 76, 0.3);
-}
-
-/* Cards & Containers - Tactile physical board game style */
+/* Collectible physical board game card styling */
 .premium-card {
-  background-color: #15151D;
+  background-color: rgba(58, 29, 66, 0.4);
   border-radius: 2rem;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.25);
   transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 .premium-card:hover {
-  transform: translateY(-8px);
-  border-color: rgba(201, 168, 76, 0.4);
-  box-shadow: 0 10px 40px rgba(201, 168, 76, 0.15);
+  transform: scale(1.02) translateY(-6px);
+  border-color: rgba(248, 177, 70, 0.45);
+  box-shadow: 0 20px 40px rgba(248, 177, 70, 0.14);
+}
+
+/* Pulse sunset glow border indicator */
+.neon-pulse-gold {
+  animation: pulseGold 3s ease-in-out infinite;
+  box-shadow: 0 0 25px rgba(248, 177, 70, 0.2);
+  border-color: rgba(248, 177, 70, 0.25);
 }
 
 /* Text Lift animations */
@@ -92,4 +134,384 @@
 
 .lift-link:hover {
   transform: translateY(-1px);
+}
+
+/* ==========================================================
+   EASTER EGGS INTERACTIVE STYLES
+   ========================================================== */
+
+/* 1. 3D Die-Crest Spin Animation */
+@keyframes dieSpin {
+  0% {
+    transform: scale(1) rotate3d(0, 0, 0, 0deg);
+    filter: drop-shadow(0 0 8px rgba(248, 177, 70, 0.25));
+  }
+  15% {
+    transform: scale(1.2) rotate3d(1, 1, 0, 180deg) rotate(45deg);
+    filter: drop-shadow(0 0 18px rgba(248, 177, 70, 0.6));
+  }
+  45% {
+    transform: scale(1.25) rotate3d(0, 1, 1, 540deg) rotate(-45deg);
+    filter: drop-shadow(0 0 24px rgba(248, 177, 70, 0.8));
+  }
+  75% {
+    transform: scale(1.15) rotate3d(1, 0, 1, 900deg) rotate(15deg);
+    filter: drop-shadow(0 0 18px rgba(248, 177, 70, 0.6));
+  }
+  100% {
+    transform: scale(1) rotate3d(0, 0, 0, 1080deg);
+    filter: drop-shadow(0 0 8px rgba(248, 177, 70, 0.25));
+  }
+}
+
+.logo-die-spin {
+  animation: dieSpin 1.4s cubic-bezier(0.25, 1, 0.3, 1) forwards;
+}
+
+/* 2. 3D Card Flipping Mechanical Styles */
+.flip-container {
+  perspective: 1500px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.flip-inner {
+  transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+  transform-style: preserve-3d;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.flip-container.flipped .flip-inner {
+  transform: rotateY(180deg);
+}
+
+.flip-front, .flip-back {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.flip-front {
+  position: relative;
+  z-index: 1;
+}
+
+.flip-back {
+  position: absolute;
+  inset: 0;
+  transform: rotateY(180deg);
+  z-index: 2;
+}
+
+/* 3. Midnight Neon Lounge Theme Morphing */
+.gaming-mode {
+  background-color: #0A0A0F !important;
+  background-image: radial-gradient(circle at top, var(--tw-gradient-stops)) !important;
+  --tw-gradient-from: #1A0E30 !important;
+  --tw-gradient-via: #0A0A0F !important;
+  --tw-gradient-to: #050507 !important;
+  color: #FFFFFF !important;
+}
+
+/* Morph transition elements */
+.gaming-mode nav,
+.gaming-mode section,
+.gaming-mode footer,
+.gaming-mode .premium-card,
+.gaming-mode input,
+.gaming-mode h2,
+.gaming-mode h3,
+.gaming-mode h4,
+.gaming-mode span,
+.gaming-mode p,
+.gaming-mode a,
+.gaming-mode button {
+  transition: all 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.gaming-mode .premium-card {
+  background-color: rgba(14, 14, 22, 0.9) !important;
+  border-color: rgba(248, 177, 70, 0.25) !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 0 25px rgba(248, 177, 70, 0.08) !important;
+}
+
+.gaming-mode .premium-card:hover {
+  border-color: #f8b146 !important;
+  box-shadow: 0 0 35px rgba(248, 177, 70, 0.28) !important;
+}
+
+.gaming-mode h2, 
+.gaming-mode h3,
+.gaming-mode .text-obsidian {
+  color: #FFFFFF !important;
+}
+
+.gaming-mode .text-slate-text,
+.gaming-mode p {
+  color: #9CA3AF !important;
+}
+
+.gaming-mode nav {
+  background-color: rgba(10, 10, 15, 0.75) !important;
+  border-color: rgba(248, 177, 70, 0.2) !important;
+  box-shadow: 0 0 30px rgba(248, 177, 70, 0.15) !important;
+}
+
+.gaming-mode nav button,
+.gaming-mode nav span {
+  color: #FFFFFF !important;
+}
+
+.gaming-mode nav button:hover {
+  color: #f8b146 !important;
+}
+
+.gaming-mode footer {
+  background-color: rgba(5, 5, 8, 0.85) !important;
+  border-color: rgba(248, 177, 70, 0.2) !important;
+}
+
+.gaming-mode footer p,
+.gaming-mode footer span,
+.gaming-mode footer button,
+.gaming-mode footer a {
+  color: #9CA3AF !important;
+}
+
+.gaming-mode footer h4 {
+  color: #f8b146 !important;
+}
+
+/* Special input styling in gaming mode */
+.gaming-mode input {
+  background-color: rgba(255, 255, 255, 0.03) !important;
+  border-color: rgba(248, 177, 70, 0.2) !important;
+  color: #FFFFFF !important;
+}
+
+.gaming-mode input:focus {
+  border-color: #f8b146 !important;
+  box-shadow: 0 0 15px rgba(248, 177, 70, 0.2) !important;
+}
+
+/* Jenga Block Style */
+.jenga-block {
+  background: #f8b146;
+  border: 1.5px solid rgba(17, 17, 21, 0.15);
+  box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.35), inset 0 -2px 4px rgba(0, 0, 0, 0.2), 0 2px 4px rgba(0, 0, 0, 0.1);
+  height: 20px;
+  border-radius: 4px;
+}
+
+.gaming-mode .jenga-block {
+  background: #f8b146;
+  border-color: rgba(255, 255, 255, 0.25);
+  box-shadow: 0 0 10px rgba(248, 177, 70, 0.4), inset 0 2px 4px rgba(255, 255, 255, 0.4);
+}
+
+
+/* --- EASTER EGGS STYLING --- */
+
+/* 1. Midnight Neon Lounge (Gaming Mode) */
+.gaming-mode {
+  background-color: #0A0A0F !important;
+  color: #FFFDF6 !important;
+}
+
+.gaming-mode .text-obsidian {
+  color: #FFFDF6 !important;
+}
+
+.gaming-mode .text-slate-text {
+  color: #A0A0AA !important;
+}
+
+.gaming-mode .bg-white {
+  background-color: #12121A !important;
+  border-color: rgba(248, 177, 70, 0.25) !important;
+}
+
+.gaming-mode .bg-white\/60 {
+  background-color: rgba(18, 18, 26, 0.7) !important;
+  border-color: rgba(248, 177, 70, 0.15) !important;
+}
+
+.gaming-mode .border-black\/5,
+.gaming-mode .border-black\/\[0\.05\],
+.gaming-mode .border-black\/\[0\.06\] {
+  border-color: rgba(248, 177, 70, 0.15) !important;
+}
+
+.gaming-mode .premium-card,
+.gaming-mode .bg-\[\#FFFFFF\] {
+  background-color: #12121A !important;
+  border-color: rgba(248, 177, 70, 0.2) !important;
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.7) !important;
+}
+
+.gaming-mode .premium-card:hover {
+  border-color: rgba(248, 177, 70, 0.8) !important;
+  box-shadow: 0 0 20px rgba(248, 177, 70, 0.6) !important;
+}
+
+/* Pulse intense neon glow for gold borders */
+.gaming-mode .border-\[\#C9A84C\],
+.gaming-mode .border-gold-logo\/30 {
+  border-color: #f8b146 !important;
+  box-shadow: 0 0 20px rgba(248, 177, 70, 0.8) !important;
+  animation: neonGlowPulse 1.5s ease-in-out infinite alternate !important;
+}
+
+@keyframes neonGlowPulse {
+  0% {
+    box-shadow: 0 0 10px rgba(248, 177, 70, 0.3);
+    border-color: rgba(248, 177, 70, 0.5);
+  }
+  100% {
+    box-shadow: 0 0 25px rgba(248, 177, 70, 0.9);
+    border-color: rgba(248, 177, 70, 1);
+  }
+}
+
+/* 2. Dice Roll 3D Spin */
+@keyframes dieSpin {
+  0% {
+    transform: rotate(0deg) skew(0deg) scale(1);
+  }
+  20% {
+    transform: rotate(180deg) skew(12deg, 12deg) scale(1.15);
+  }
+  40% {
+    transform: rotate(360deg) skew(-10deg, -15deg) scale(0.9);
+  }
+  60% {
+    transform: rotate(540deg) skew(15deg, 8deg) scale(1.2);
+  }
+  80% {
+    transform: rotate(720deg) skew(-4deg, -4deg) scale(0.95);
+  }
+  100% {
+    transform: rotate(1080deg) skew(0deg) scale(1);
+  }
+}
+
+.die-spin-active {
+  animation: dieSpin 1.2s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  perspective: 1000px;
+}
+
+/* 3. 3D Card Flip Mechanism */
+.flip-container {
+  perspective: 1200px;
+  height: 100%;
+}
+
+.flip-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-style: preserve-3d;
+}
+
+.flip-inner.flipped {
+  transform: rotateY(180deg);
+}
+
+.flip-front,
+.flip-back {
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.flip-back {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform: rotateY(180deg);
+  z-index: 2;
+}
+
+/* 4. Jenga Tower Animations */
+@keyframes towerShake {
+  0%, 100% { transform: rotateX(-22deg) rotateY(45deg) translate3d(0, 0, 0); }
+  20%, 60% { transform: rotateX(-22deg) rotateY(42deg) translate3d(-1px, 0, 1px); }
+  40%, 80% { transform: rotateX(-21deg) rotateY(48deg) translate3d(1px, 0, -1px); }
+}
+
+.tower-shake {
+  animation: towerShake 0.12s ease-in-out infinite;
+}
+
+@keyframes toppleLeft {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-150px, 300px) rotate(-45deg);
+    opacity: 0;
+  }
+}
+
+@keyframes toppleRight {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(150px, 300px) rotate(45deg);
+    opacity: 0;
+  }
+}
+
+@keyframes toppleCenter {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(0, 250px) scale(0.9);
+    opacity: 0;
+  }
+}
+
+.topple-left {
+  animation: toppleLeft 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards !important;
+}
+
+.topple-right {
+  animation: toppleRight 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards !important;
+}
+
+.topple-center {
+  animation: toppleCenter 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards !important;
+}
+
+@keyframes slideUpFade {
+  0% {
+    transform: translateY(30px) scale(0.95);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+.toast-slide-up {
+  animation: slideUpFade 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
