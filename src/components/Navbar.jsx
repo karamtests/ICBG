@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Sparkles, MapPin } from 'lucide-react';
+import { Sparkles, MapPin, Menu, X } from 'lucide-react';
 
 export default function Navbar({ onOpenAdmin, currentView }) {
   const [scrolled, setScrolled] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -142,23 +143,59 @@ export default function Navbar({ onOpenAdmin, currentView }) {
       </div>
 
       {/* Action CTA Buttons */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2 md:gap-3">
         <a
           href="https://maps.app.goo.gl/R6WFBay7Piyfoe1w9?g_st=ic"
           target="_blank"
           rel="noopener noreferrer"
-          className="hidden sm:flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-widest text-[#C8B1CC] hover:text-[#f8b146] transition-colors duration-300"
+          className="hidden lg:flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-widest text-[#C8B1CC] hover:text-[#f8b146] transition-colors duration-300"
         >
           <MapPin size={12} className="text-[#f8b146]" />
           Cortina.D Cafe
         </a>
         <button
           onClick={() => scrollToSection('join')}
-          className="group relative px-5 py-2.5 bg-gradient-to-r from-[#f8b146] to-[#f28a75] text-[#3a1d42] font-sans font-black text-xs uppercase tracking-widest rounded-full shadow-lg shadow-[#f8b146]/15 hover:scale-[1.05] hover:shadow-[0_0_25px_rgba(248,177,70,0.35)] transition-all duration-300 ease-out overflow-hidden flex items-center gap-1 cursor-pointer animate-float"
+          className="group relative px-4 md:px-5 py-2 md:py-2.5 bg-gradient-to-r from-[#f8b146] to-[#f28a75] text-[#3a1d42] font-sans font-black text-[10px] md:text-xs uppercase tracking-widest rounded-full shadow-lg shadow-[#f8b146]/15 hover:scale-[1.05] hover:shadow-[0_0_25px_rgba(248,177,70,0.35)] transition-all duration-300 ease-out overflow-hidden flex items-center gap-1 cursor-pointer animate-float shrink-0"
         >
-          Join Club <Sparkles size={12} className="text-[#3a1d42] group-hover:animate-pulse" />
+          Join Club <Sparkles size={10} className="text-[#3a1d42] group-hover:animate-pulse" />
+        </button>
+        {/* Mobile Hamburger Trigger */}
+        <button
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          className="flex md:hidden items-center justify-center p-2 rounded-full border border-white/10 hover:border-[#f8b146]/30 text-[#C8B1CC] hover:text-white transition-all cursor-pointer shrink-0"
+          aria-label="Toggle Menu"
+        >
+          {isMobileMenuOpen ? <X size={16} /> : <Menu size={16} />}
         </button>
       </div>
+
+      {/* Mobile Drawer Dropdown Overlay */}
+      {isMobileMenuOpen && (
+        <div className="absolute top-[105%] left-0 right-0 mt-2 mx-auto w-full bg-[#3a1d42]/95 border border-white/10 backdrop-blur-2xl rounded-3xl p-5 shadow-2xl flex flex-col gap-3.5 md:hidden z-50 animate-slideDown">
+          {['About', 'Collection', 'Gallery'].map((item) => (
+            <button
+              key={item}
+              onClick={() => {
+                setIsMobileMenuOpen(false);
+                scrollToSection(item.toLowerCase());
+              }}
+              className="font-sans font-bold text-left py-2.5 px-4 rounded-xl border border-white/5 bg-white/5 hover:bg-[#f8b146]/10 text-white/90 hover:text-[#f8b146] transition-all cursor-pointer text-xs uppercase tracking-wider"
+            >
+              {item}
+            </button>
+          ))}
+          <a
+            href="https://maps.app.goo.gl/R6WFBay7Piyfoe1w9?g_st=ic"
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => setIsMobileMenuOpen(false)}
+            className="flex items-center gap-2 font-mono text-[9px] uppercase tracking-widest text-[#C8B1CC] hover:text-[#f8b146] py-1.5 px-4"
+          >
+            <MapPin size={12} className="text-[#f8b146]" />
+            Cortina.D Cafe (Irbid)
+          </a>
+        </div>
+      )}
 
       {/* Monospace Initiative Toast notification at the bottom corner */}
       {toast && (

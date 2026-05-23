@@ -1,7 +1,7 @@
 import React from 'react';
 import { Calendar, Heart, Shield, Sparkles, MapPin, Sheet, TableProperties } from 'lucide-react';
 
-export default function Footer({ onTriggerJenga }) {
+export default function Footer({ onTriggerJenga, onOpenDisputes }) {
   const currentYear = new Date().getFullYear();
   
   // Secret triple click on the year "1983" triggers the cascading Jenga Easter Egg
@@ -120,7 +120,7 @@ export default function Footer({ onTriggerJenga }) {
           {/* Copyrights */}
           <div className="flex flex-col md:flex-row items-center gap-4 text-xs font-mono text-[#C8B1CC]/50">
             <span>
-              © {currentYear} ICBG Atelier. Est. <span onClick={handleJengaClick} className="cursor-pointer hover:text-[#f8b146] border-b border-dotted border-[#f8b146]/45 hover:border-[#f8b146] font-semibold transition-all duration-300 select-none">1983</span>. All rights reserved.
+              © {currentYear} <span onClick={onOpenDisputes} className="cursor-pointer hover:text-[#f8b146] hover:underline transition-colors duration-300" title="Appeal to the Supreme Disputes Court! ⚖️">ICBG Atelier</span>. Est. <span onClick={handleJengaClick} className="cursor-pointer hover:text-[#f8b146] border-b border-dotted border-[#f8b146]/45 hover:border-[#f8b146] font-semibold transition-all duration-300 select-none">1983</span>. All rights reserved.
             </span>
             <span className="hidden md:inline text-white/10">|</span>
             <span className="flex items-center gap-1 text-white">

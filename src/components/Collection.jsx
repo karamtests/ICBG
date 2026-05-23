@@ -1,8 +1,8 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import gamesData from '../data/board_games.json';
-import { Search, Users, Clock, Calendar, ExternalLink, Play, Film, Award, Hash } from 'lucide-react';
+import { Search, Users, Clock, Calendar, ExternalLink, Play, Film, Award, Hash, RotateCw } from 'lucide-react';
 
-function GameCard({ game, index, getCleanLink, handleImageError }) {
+const GameCard = React.memo(function GameCard({ game, index, getCleanLink, handleImageError }) {
   const [isFlipped, setIsFlipped] = React.useState(false);
   const flippableTitles = ['Catan', 'Chess', 'Dixit', 'Secret Hitler', 'Sheriff of Nottingham', 'The Mind'];
   const isFlippable = flippableTitles.includes(game.title);
@@ -106,9 +106,16 @@ function GameCard({ game, index, getCleanLink, handleImageError }) {
                 {game.competition}
               </span>
               {isFlippable && (
-                <span className="px-2 py-0.5 rounded-md font-mono text-[9px] font-bold uppercase tracking-wider bg-[#f8b146]/20 border border-[#f8b146]/45 text-[#f8b146] animate-pulse">
-                  ★ Rare Secret
-                </span>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsFlipped(true);
+                  }}
+                  className="px-2 py-0.5 rounded-md font-mono text-[9px] font-bold uppercase tracking-wider bg-[#f8b146]/20 border border-[#f8b146]/45 text-[#f8b146] animate-pulse flex items-center gap-1 hover:bg-[#f8b146]/35 transition-colors cursor-pointer"
+                  title="Click to reveal secret!"
+                >
+                  ★ Rare Secret <RotateCw size={8} />
+                </button>
               )}
             </div>
 
@@ -255,10 +262,19 @@ function GameCard({ game, index, getCleanLink, handleImageError }) {
       </div>
     </div>
   );
-}
+});
 
 export default function Collection({ extraGames = [] }) {
+  const [localSearchTerm, setLocalSearchTerm] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setSearchTerm(localSearchTerm);
+    }, 150);
+    return () => clearTimeout(handler);
+  }, [localSearchTerm]);
+
   const [activeType, setActiveType] = useState('All');
   const [activeComp, setActiveComp] = useState('All');
 
@@ -270,7 +286,7 @@ export default function Collection({ extraGames = [] }) {
   const compTypes = ['All', 'Competitive', 'Cooperative'];
 
   // Handle broken images gracefully with a beautiful text placeholder
-  const handleImageError = (e, title) => {
+  const handleImageError = useCallback((e, title) => {
     e.target.style.display = 'none';
     const parent = e.target.parentNode;
     if (parent && !parent.querySelector('.img-fallback')) {
@@ -290,7 +306,7 @@ export default function Collection({ extraGames = [] }) {
       `;
       parent.appendChild(fallback);
     }
-  };
+  }, []);
 
   // Filter logic
   const filteredGames = useMemo(() => {
@@ -311,17 +327,22 @@ export default function Collection({ extraGames = [] }) {
     });
   }, [allGames, searchTerm, activeType, activeComp]);
 
-  // Decode Google redirects inside our links cleanly if possible
-  const getCleanLink = (link) => {
+  // Decode Google redirects inside our links cleanly if possible & prevent Stored XSS
+  const getCleanLink = useCallback((link) => {
     if (!link) return '#';
+    let clean = link;
     if (link.includes('url?q=')) {
       const parts = link.split('url?q=');
       if (parts.length > 1) {
-        return decodeURIComponent(parts[1].split('&')[0]);
+        clean = decodeURIComponent(parts[1].split('&')[0]);
       }
     }
-    return link;
-  };
+    // Block dangerous javascript: protocols (P0 Stored XSS Fix)
+    if (clean.trim().toLowerCase().startsWith('javascript:')) {
+      return '#';
+    }
+    return clean;
+  }, []);
 
   return (
     <section
@@ -368,14 +389,14 @@ export default function Collection({ extraGames = [] }) {
             <input
               type="text"
               placeholder="Search by title, theme, mechanics..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              value={localSearchTerm}
+              onChange={(e) => setLocalSearchTerm(e.target.value)}
               className="w-full py-4 pl-14 pr-6 bg-[#25102a]/45 border border-white/10 focus:border-[#f8b146] focus:ring-1 focus:ring-[#f8b146]/20 text-white placeholder-white/30 rounded-full font-mono text-sm tracking-wide focus:outline-none transition-all duration-300 shadow-sm"
             />
-            {searchTerm && (
+            {localSearchTerm && (
               <button 
-                onClick={() => setSearchTerm('')} 
-                className="absolute inset-y-0 right-5 flex items-center text-xs font-mono text-white/60 hover:text-[#f8b146]"
+                onClick={() => setLocalSearchTerm('')} 
+                className="absolute inset-y-0 right-5 flex items-center text-xs font-mono text-white/60 hover:text-[#f8b146] cursor-pointer"
               >
                 CLEAR
               </button>
@@ -458,11 +479,12 @@ export default function Collection({ extraGames = [] }) {
             </p>
             <button
               onClick={() => {
+                setLocalSearchTerm('');
                 setSearchTerm('');
                 setActiveType('All');
                 setActiveComp('All');
               }}
-              className="mt-6 font-mono text-xs text-[#f8b146] hover:underline uppercase tracking-wider font-bold"
+              className="mt-6 font-mono text-xs text-[#f8b146] hover:underline uppercase tracking-wider font-bold cursor-pointer"
             >
               Reset Filters
             </button>

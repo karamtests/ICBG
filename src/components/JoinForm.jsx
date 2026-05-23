@@ -36,8 +36,8 @@ export default function JoinForm() {
           error = 'Full name is required';
         } else if (value.trim().length < 3) {
           error = 'Name must be at least 3 characters long';
-        } else if (!/^[A-Za-z\s]+$/.test(value)) {
-          error = 'Name must contain only letters and spaces';
+        } else if (!/^[\u0600-\u06FFA-Za-z\s'-]+$/.test(value)) {
+          error = 'Name must contain only letters and spaces (supports English & Arabic)';
         }
         break;
       case 'email':
@@ -125,11 +125,13 @@ export default function JoinForm() {
     // Check if form is valid
     const hasErrors = Object.values(newErrors).some(err => err !== '');
     if (hasErrors) {
-      // Find the first error and shake or scroll into view
+      // Find the first error and shake or scroll into view safely
       const firstErrorField = Object.keys(newErrors).find(field => newErrors[field] !== '');
-      const element = document.getElementsByName(firstErrorField)[0];
+      const element = firstErrorField === 'gameTypes'
+        ? document.getElementById('game-categories-grid')
+        : document.getElementById(firstErrorField);
       if (element) {
-        element.focus();
+        element.focus?.();
         element.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
       return;
@@ -138,8 +140,24 @@ export default function JoinForm() {
     // Submit state animation trigger
     setIsSubmitting(true);
 
-    // Simulate standard upscale API endpoint execution
+    // Save submission to localStorage safely and simulate API latency
     setTimeout(() => {
+      try {
+        const stored = localStorage.getItem('icbg_applications');
+        const list = stored ? JSON.parse(stored) : [];
+        const newApplication = {
+          id: Date.now(),
+          fullName: formData.fullName.trim(),
+          email: formData.email.trim(),
+          phone: formData.phone.trim(),
+          gameTypes: formData.gameTypes,
+          date: new Date().toISOString()
+        };
+        list.push(newApplication);
+        localStorage.setItem('icbg_applications', JSON.stringify(list));
+      } catch (error) {
+        console.warn("Failed to save application to localStorage:", error);
+      }
       setIsSubmitting(false);
       setIsSuccess(true);
     }, 1800);
@@ -195,7 +213,7 @@ export default function JoinForm() {
               
               {/* Full Name Input */}
               <div className="flex flex-col group">
-                <label className="font-mono text-[10px] uppercase tracking-widest text-white/70 mb-2 font-bold flex items-center gap-1.5 transition-colors group-focus-within:text-[#f8b146]">
+                <label htmlFor="fullName" className="font-mono text-[10px] uppercase tracking-widest text-white/70 mb-2 font-bold flex items-center gap-1.5 transition-colors group-focus-within:text-[#f8b146]">
                   <User size={12} />
                   Full Name
                 </label>
@@ -203,6 +221,7 @@ export default function JoinForm() {
                   <input
                     type="text"
                     name="fullName"
+                    id="fullName"
                     value={formData.fullName}
                     onChange={handleChange}
                     onBlur={() => handleBlur('fullName')}
@@ -227,7 +246,7 @@ export default function JoinForm() {
                 
                 {/* Email Input */}
                 <div className="flex flex-col group">
-                  <label className="font-mono text-[10px] uppercase tracking-widest text-white/70 mb-2 font-bold flex items-center gap-1.5 transition-colors group-focus-within:text-[#f8b146]">
+                  <label htmlFor="email" className="font-mono text-[10px] uppercase tracking-widest text-white/70 mb-2 font-bold flex items-center gap-1.5 transition-colors group-focus-within:text-[#f8b146]">
                     <Mail size={12} />
                     Email Address
                   </label>
@@ -235,6 +254,7 @@ export default function JoinForm() {
                     <input
                       type="email"
                       name="email"
+                      id="email"
                       value={formData.email}
                       onChange={handleChange}
                       onBlur={() => handleBlur('email')}
@@ -256,7 +276,7 @@ export default function JoinForm() {
 
                 {/* Phone Input */}
                 <div className="flex flex-col group">
-                  <label className="font-mono text-[10px] uppercase tracking-widest text-white/70 mb-2 font-bold flex items-center gap-1.5 transition-colors group-focus-within:text-[#f8b146]">
+                  <label htmlFor="phone" className="font-mono text-[10px] uppercase tracking-widest text-white/70 mb-2 font-bold flex items-center gap-1.5 transition-colors group-focus-within:text-[#f8b146]">
                     <Phone size={12} />
                     Phone Number
                   </label>
@@ -264,6 +284,7 @@ export default function JoinForm() {
                     <input
                       type="text"
                       name="phone"
+                      id="phone"
                       value={formData.phone}
                       onChange={handleChange}
                       onBlur={() => handleBlur('phone')}
@@ -292,7 +313,7 @@ export default function JoinForm() {
                   Preferred Board Game Categories
                 </label>
                 
-                <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+                <div id="game-categories-grid" className="grid grid-cols-2 sm:grid-cols-5 gap-3" tabIndex={-1}>
                   {GAME_CATEGORIES.map((category) => {
                     const isSelected = formData.gameTypes.includes(category);
                     return (

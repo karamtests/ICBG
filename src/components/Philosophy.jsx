@@ -5,7 +5,7 @@ import { Quote, Compass, Calendar, Coffee } from 'lucide-react';
 
 gsap.registerPlugin(ScrollTrigger);
 
-export default function Philosophy() {
+export default function Philosophy({ onTriggerMeepleRain }) {
   const containerRef = useRef(null);
   const leftTextRef = useRef(null);
   const rightTextRef = useRef(null);
@@ -68,12 +68,16 @@ export default function Philosophy() {
       <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-10">
         
         {/* The Manifesto Header */}
-        <div className="philosophy-header flex flex-col items-center text-center mb-20 md:mb-28">
-          <Quote className="text-gold-logo mb-6 opacity-80" size={40} />
-          <h2 className="font-serif italic text-3xl md:text-5xl text-white max-w-3xl leading-relaxed">
+        <div 
+          onDoubleClick={onTriggerMeepleRain}
+          title="Double click to summon the Meeple Storm! 🌾"
+          className="philosophy-header flex flex-col items-center text-center mb-20 md:mb-28 cursor-pointer select-none group"
+        >
+          <Quote className="text-[#f8b146] mb-6 opacity-80 group-hover:scale-110 transition-transform duration-300" size={40} />
+          <h2 className="font-serif italic text-3xl md:text-5xl text-white max-w-3xl leading-relaxed group-hover:text-[#f8b146]/95 transition-colors duration-300">
             "We are not merely playing board games. We are preserving the tactile magic of strategic camaraderie in a digital world."
           </h2>
-          <div className="w-16 h-[1px] bg-gold-logo mt-8" />
+          <div className="w-16 h-[1px] bg-[#f8b146] mt-8 group-hover:w-28 transition-all duration-300" />
         </div>
 
         {/* Contrast Philosophy Section */}

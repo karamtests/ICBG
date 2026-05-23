@@ -2,7 +2,7 @@ import React from 'react';
 import { Camera, Image as ImageIcon, MapPin, Trash2 } from 'lucide-react';
 
 // Default hardcoded gallery images
-const DEFAULT_IMAGES = [
+export const DEFAULT_IMAGES = [
   {
     src: '/assets/images/gallery/community-1.jpeg',
     title: 'Deep Focus & Tactical Clashes',
@@ -28,9 +28,85 @@ const DEFAULT_IMAGES = [
 
 const ASPECT_OPTIONS = ['aspect-[3/4]', 'aspect-square', 'aspect-[4/3]'];
 
-export default function Gallery({ extraImages = [] }) {
-  // Merge default images with admin-added ones
-  const allImages = [...DEFAULT_IMAGES, ...extraImages];
+// Stateful wrapper component for each gallery image to handle loading/error state gracefully
+function GalleryImage({ src, title, category }) {
+  const [hasError, setHasError] = React.useState(false);
+  const [isLoaded, setIsLoaded] = React.useState(false);
+
+  return (
+    <div className="relative w-full h-[72%] rounded-[1.8rem] overflow-hidden bg-[#25102a]/45 border border-white/10">
+      {/* Loading Skeleton */}
+      {!isLoaded && !hasError && (
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-[#25102a] via-[#3a1d42] to-[#25102a] animate-pulse z-10">
+          <div className="relative w-10 h-10 flex items-center justify-center">
+            {/* Pulsing glow ring */}
+            <div className="absolute inset-0 rounded-full border border-[#f8b146]/20 animate-ping" />
+            <ImageIcon className="text-[#f8b146]/40 animate-pulse" size={20} />
+          </div>
+          <span className="mt-2 font-mono text-[8px] uppercase tracking-widest text-[#f8b146]/40 select-none">
+            LOADING ART...
+          </span>
+        </div>
+      )}
+
+      {hasError ? (
+        <div className="absolute inset-0 flex flex-col items-center justify-center p-6 bg-gradient-to-br from-[#25102a] via-[#3a1d42] to-[#1a0b1e] select-none z-10 animate-fade-in">
+          {/* Neon background glows inside the card */}
+          <div className="absolute top-1/4 left-1/4 w-32 h-32 bg-[#f8b146]/5 rounded-full filter blur-xl pointer-events-none" />
+          <div className="absolute bottom-1/4 right-1/4 w-32 h-32 bg-[#f28a75]/5 rounded-full filter blur-xl pointer-events-none" />
+          
+          {/* Luxury Frame Border */}
+          <div className="absolute inset-3 border border-dashed border-[#f8b146]/15 rounded-[1.2rem] pointer-events-none" />
+          
+          {/* Decorative Corner Ornaments */}
+          <div className="absolute top-4 left-4 w-2 h-2 border-t border-l border-[#f8b146]/40" />
+          <div className="absolute top-4 right-4 w-2 h-2 border-t border-r border-[#f8b146]/40" />
+          <div className="absolute bottom-4 left-4 w-2 h-2 border-b border-l border-[#f8b146]/40" />
+          <div className="absolute bottom-4 right-4 w-2 h-2 border-b border-r border-[#f8b146]/40" />
+
+          {/* Luxury Card Content */}
+          <div className="relative flex flex-col items-center text-center z-10">
+            <div className="w-12 h-12 rounded-full bg-gradient-to-b from-[#f8b146]/10 to-[#f28a75]/10 border border-[#f8b146]/20 flex items-center justify-center mb-3 shadow-[0_0_15px_rgba(248,177,70,0.1)]">
+              <ImageIcon className="text-[#f8b146]/80 stroke-[1.5]" size={20} />
+            </div>
+            
+            <p className="font-mono text-[9px] uppercase tracking-[0.3em] text-[#f8b146] font-bold">
+              ATELIER MEMORY
+            </p>
+            
+            <div className="h-[1px] w-12 bg-gradient-to-r from-transparent via-[#f8b146]/30 to-transparent my-2" />
+            
+            <p className="font-serif italic text-[10px] text-[#C8B1CC] max-w-[85%] leading-relaxed">
+              "The board is set, the pieces move."
+            </p>
+          </div>
+        </div>
+      ) : (
+        <img
+          src={src}
+          alt={title}
+          onLoad={() => setIsLoaded(true)}
+          onError={() => setHasError(true)}
+          className={`w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.06] ${
+            isLoaded ? 'opacity-100' : 'opacity-0'
+          }`}
+        />
+      )}
+
+      {/* Subtle vignette gradient overlay */}
+      <div className="absolute inset-0 bg-gradient-to-t from-[#25102a]/80 via-[#25102a]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-10" />
+
+      {/* Category Tag overlay on image */}
+      <span className="absolute top-4 left-4 px-3.5 py-1.5 rounded-full font-mono text-[9px] uppercase tracking-wider bg-[#3a1d42]/90 text-[#f8b146] border border-[#f8b146]/30 shadow-md backdrop-blur-sm z-20 pointer-events-none">
+        {category}
+      </span>
+    </div>
+  );
+}
+
+export default function Gallery({ images = DEFAULT_IMAGES }) {
+  // Use passed images, fallback if empty
+  const allImages = images && images.length > 0 ? images : DEFAULT_IMAGES;
 
   return (
     <section
@@ -66,20 +142,8 @@ export default function Gallery({ extraImages = [] }) {
               key={idx}
               className={`relative overflow-hidden group bg-[#3a1d42]/30 border border-white/8 shadow-md p-5 rounded-[2rem] ${img.aspect || 'aspect-square'} flex flex-col justify-between transition-all duration-500 ease-out hover:scale-[1.02] hover:-translate-y-1.5 hover:border-[#f8b146]/40 hover:shadow-[0_20px_40px_rgba(248,177,70,0.12)]`}
             >
-              {/* Inner Image Container */}
-              <div className="relative w-full h-[72%] rounded-[1.8rem] overflow-hidden bg-[#25102a]/45 border border-white/10">
-                <div 
-                  className="w-full h-full bg-cover bg-center transition-transform duration-700 ease-out group-hover:scale-[1.06]"
-                  style={{ backgroundImage: `url('${img.src}')` }}
-                />
-                {/* Subtle vignette gradient */}
-                <div className="absolute inset-0 bg-gradient-to-t from-[#25102a]/80 via-[#25102a]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                
-                {/* Category Tag overlay on image */}
-                <span className="absolute top-4 left-4 px-3.5 py-1.5 rounded-full font-mono text-[9px] uppercase tracking-wider bg-[#3a1d42]/90 text-[#f8b146] border border-[#f8b146]/30 shadow-md backdrop-blur-sm">
-                  {img.category}
-                </span>
-              </div>
+              {/* Inner Image Container with fallback state and semantic image tag */}
+              <GalleryImage src={img.src} title={img.title} category={img.category} />
 
               {/* Text Meta Container */}
               <div className="mt-4 text-left px-2">

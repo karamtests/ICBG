@@ -2,20 +2,26 @@ import React from 'react';
 import { Calendar, MapPin, Sparkles, Play, BookOpen, MessageSquare } from 'lucide-react';
 
 export default function WeeklySpotlight({ schedule, games, onScrollToCollection }) {
-  // Find featured game objects from the games vault
-  const featuredGames = (schedule.featuredGameTitles || []).map(title => {
-    const game = games.find(g => g.title.toLowerCase() === title.toLowerCase());
-    if (game) return game;
-    // Fallback if the game was newly added/custom in schedule
-    return {
-      title,
-      type: 'Spotlight',
-      players: '2-6 Players',
-      theme: 'Strategic Board Game',
-      box_img: '',
-      isFallback: true
-    };
-  });
+  // Find featured game objects from the games vault safely
+  const featuredGames = (schedule.featuredGameTitles || [])
+    .filter(title => typeof title === 'string' && title.trim())
+    .map(title => {
+      const game = games.find(g => 
+        g && 
+        typeof g.title === 'string' && 
+        g.title.toLowerCase() === title.toLowerCase()
+      );
+      if (game) return game;
+      // Fallback if the game was newly added/custom in schedule
+      return {
+        title,
+        type: 'Spotlight',
+        players: '2-6 Players',
+        theme: 'Strategic Board Game',
+        box_img: '',
+        isFallback: true
+      };
+    });
 
   return (
     <section id="weekly" className="py-24 relative overflow-hidden w-full bg-transparent border-t border-b border-white/5">
@@ -123,12 +129,14 @@ export default function WeeklySpotlight({ schedule, games, onScrollToCollection 
 
           {/* Right Column: Featured Games Slider */}
           <div className="lg:col-span-8 flex flex-col justify-between">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 h-full">
-              {featuredGames.slice(0, 4).map((game, idx) => {
-                const initials = game.title.split(' ').map(n => n[0]).slice(0, 3).join('').toUpperCase();
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {featuredGames.map((game, idx) => {
+                const initials = game && typeof game.title === 'string'
+                  ? game.title.split(' ').filter(Boolean).map(n => n[0]).slice(0, 3).join('').toUpperCase()
+                  : 'GP';
                 return (
                   <div
-                    key={game.title + idx}
+                    key={(game?.title || 'game') + idx}
                     className="group bg-[#3a1d42]/30 border border-white/8 rounded-[2rem] shadow-sm p-6 flex flex-col justify-between hover:scale-[1.02] hover:-translate-y-1.5 hover:border-[#f8b146]/40 hover:shadow-[0_20px_40px_rgba(248,177,70,0.12)] transition-all duration-500 relative overflow-hidden text-left"
                   >
                     {/* Background gold gradient indicator */}

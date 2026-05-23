@@ -166,6 +166,12 @@ export default function JengaTopple({ isOpen, onClose }) {
   const canvasRef = useRef(null);
   const animationFrameRef = useRef(null);
   const particlesRef = useRef([]);
+  const timersRef = useRef([]);
+
+  const addTimer = (id) => {
+    timersRef.current.push(id);
+    return id;
+  };
 
   // Staggered assembly triggered on open
   useEffect(() => {
@@ -173,7 +179,7 @@ export default function JengaTopple({ isOpen, onClose }) {
       setShouldRender(true);
       setIsToppled(false);
       setVisibleBlocks(0);
-      setTimeout(() => setFadeClass('opacity-100'), 50);
+      addTimer(setTimeout(() => setFadeClass('opacity-100'), 50));
 
       // Staggered assembly: drop blocks every 100ms
       let blockTimer = setInterval(() => {
@@ -189,9 +195,9 @@ export default function JengaTopple({ isOpen, onClose }) {
       return () => clearInterval(blockTimer);
     } else {
       setFadeClass('opacity-0');
-      const closeTimer = setTimeout(() => {
+      const closeTimer = addTimer(setTimeout(() => {
         setShouldRender(false);
-      }, 500);
+      }, 500));
       return () => clearTimeout(closeTimer);
     }
   }, [isOpen]);
@@ -200,28 +206,28 @@ export default function JengaTopple({ isOpen, onClose }) {
   useEffect(() => {
     if (visibleBlocks === TOTAL_BLOCKS && !isToppled) {
       // Hold and wobble shake for 1 second, then collapse Jenga!
-      const toppleTimer = setTimeout(() => {
+      const toppleTimer = addTimer(setTimeout(() => {
         setIsToppled(true);
         triggerExplosion();
         
         // Stays open to show the complete scatter and fade, then closes smoothly
-        const autoCloseTimer = setTimeout(() => {
+        addTimer(setTimeout(() => {
           setFadeClass('opacity-0');
-          setTimeout(() => {
+          addTimer(setTimeout(() => {
             if (onClose) onClose();
-          }, 500);
-        }, 4200);
-
-        return () => clearTimeout(autoCloseTimer);
-      }, 1000);
+          }, 500));
+        }, 4200));
+      }, 1000));
 
       return () => clearTimeout(toppleTimer);
     }
   }, [visibleBlocks, isToppled]);
 
-  // Clean up animation frames
+  // Clean up animation frames and all queued timeouts on unmount
   useEffect(() => {
     return () => {
+      timersRef.current.forEach(clearTimeout);
+      timersRef.current = [];
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current);
       }

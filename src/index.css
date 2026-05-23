@@ -141,7 +141,7 @@
    ========================================================== */
 
 /* 1. 3D Die-Crest Spin Animation */
-@keyframes dieSpin {
+@keyframes logoDieSpin {
   0% {
     transform: scale(1) rotate3d(0, 0, 0, 0deg);
     filter: drop-shadow(0 0 8px rgba(248, 177, 70, 0.25));
@@ -165,7 +165,7 @@
 }
 
 .logo-die-spin {
-  animation: dieSpin 1.4s cubic-bezier(0.25, 1, 0.3, 1) forwards;
+  animation: logoDieSpin 1.4s cubic-bezier(0.25, 1, 0.3, 1) forwards;
 }
 
 /* 2. 3D Card Flipping Mechanical Styles */
@@ -177,25 +177,25 @@
 }
 
 .flip-inner {
-  transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.1);
-  transform-style: preserve-3d;
   position: relative;
   width: 100%;
   height: 100%;
+  transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+  transform-style: preserve-3d;
   display: flex;
   flex-direction: column;
   flex: 1;
 }
 
-.flip-container.flipped .flip-inner {
+.flip-inner.flipped {
   transform: rotateY(180deg);
 }
 
 .flip-front, .flip-back {
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
   width: 100%;
   height: 100%;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -213,14 +213,14 @@
   z-index: 2;
 }
 
-/* 3. Midnight Neon Lounge Theme Morphing */
+/* 3. Midnight Neon Lounge (Gaming Mode) Theme Morphing */
 .gaming-mode {
   background-color: #0A0A0F !important;
   background-image: radial-gradient(circle at top, var(--tw-gradient-stops)) !important;
   --tw-gradient-from: #1A0E30 !important;
   --tw-gradient-via: #0A0A0F !important;
   --tw-gradient-to: #050507 !important;
-  color: #FFFFFF !important;
+  color: #FFFDF6 !important;
 }
 
 /* Morph transition elements */
@@ -239,27 +239,28 @@
   transition: all 1.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.gaming-mode .premium-card {
-  background-color: rgba(14, 14, 22, 0.9) !important;
-  border-color: rgba(248, 177, 70, 0.25) !important;
+.gaming-mode .premium-card,
+.gaming-mode .bg-\[\#FFFFFF\] {
+  background-color: #12121A !important;
+  border-color: rgba(248, 177, 70, 0.2) !important;
   color: #FFFFFF !important;
-  box-shadow: 0 0 25px rgba(248, 177, 70, 0.08) !important;
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.7) !important;
 }
 
 .gaming-mode .premium-card:hover {
-  border-color: #f8b146 !important;
-  box-shadow: 0 0 35px rgba(248, 177, 70, 0.28) !important;
+  border-color: rgba(248, 177, 70, 0.8) !important;
+  box-shadow: 0 0 35px rgba(248, 177, 70, 0.6) !important;
 }
 
 .gaming-mode h2, 
 .gaming-mode h3,
 .gaming-mode .text-obsidian {
-  color: #FFFFFF !important;
+  color: #FFFDF6 !important;
 }
 
 .gaming-mode .text-slate-text,
 .gaming-mode p {
-  color: #9CA3AF !important;
+  color: #A0A0AA !important;
 }
 
 .gaming-mode nav {
@@ -305,38 +306,6 @@
   box-shadow: 0 0 15px rgba(248, 177, 70, 0.2) !important;
 }
 
-/* Jenga Block Style */
-.jenga-block {
-  background: #f8b146;
-  border: 1.5px solid rgba(17, 17, 21, 0.15);
-  box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.35), inset 0 -2px 4px rgba(0, 0, 0, 0.2), 0 2px 4px rgba(0, 0, 0, 0.1);
-  height: 20px;
-  border-radius: 4px;
-}
-
-.gaming-mode .jenga-block {
-  background: #f8b146;
-  border-color: rgba(255, 255, 255, 0.25);
-  box-shadow: 0 0 10px rgba(248, 177, 70, 0.4), inset 0 2px 4px rgba(255, 255, 255, 0.4);
-}
-
-
-/* --- EASTER EGGS STYLING --- */
-
-/* 1. Midnight Neon Lounge (Gaming Mode) */
-.gaming-mode {
-  background-color: #0A0A0F !important;
-  color: #FFFDF6 !important;
-}
-
-.gaming-mode .text-obsidian {
-  color: #FFFDF6 !important;
-}
-
-.gaming-mode .text-slate-text {
-  color: #A0A0AA !important;
-}
-
 .gaming-mode .bg-white {
   background-color: #12121A !important;
   border-color: rgba(248, 177, 70, 0.25) !important;
@@ -351,18 +320,6 @@
 .gaming-mode .border-black\/\[0\.05\],
 .gaming-mode .border-black\/\[0\.06\] {
   border-color: rgba(248, 177, 70, 0.15) !important;
-}
-
-.gaming-mode .premium-card,
-.gaming-mode .bg-\[\#FFFFFF\] {
-  background-color: #12121A !important;
-  border-color: rgba(248, 177, 70, 0.2) !important;
-  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.7) !important;
-}
-
-.gaming-mode .premium-card:hover {
-  border-color: rgba(248, 177, 70, 0.8) !important;
-  box-shadow: 0 0 20px rgba(248, 177, 70, 0.6) !important;
 }
 
 /* Pulse intense neon glow for gold borders */
@@ -384,7 +341,22 @@
   }
 }
 
-/* 2. Dice Roll 3D Spin */
+/* Jenga Block Style */
+.jenga-block {
+  background: #f8b146;
+  border: 1.5px solid rgba(17, 17, 21, 0.15);
+  box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.35), inset 0 -2px 4px rgba(0, 0, 0, 0.2), 0 2px 4px rgba(0, 0, 0, 0.1);
+  height: 20px;
+  border-radius: 4px;
+}
+
+.gaming-mode .jenga-block {
+  background: #f8b146;
+  border-color: rgba(255, 255, 255, 0.25);
+  box-shadow: 0 0 10px rgba(248, 177, 70, 0.4), inset 0 2px 4px rgba(255, 255, 255, 0.4);
+}
+
+/* 4. Dice Roll 3D Spin */
 @keyframes dieSpin {
   0% {
     transform: rotate(0deg) skew(0deg) scale(1);
@@ -411,41 +383,7 @@
   perspective: 1000px;
 }
 
-/* 3. 3D Card Flip Mechanism */
-.flip-container {
-  perspective: 1200px;
-  height: 100%;
-}
-
-.flip-inner {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-  transform-style: preserve-3d;
-}
-
-.flip-inner.flipped {
-  transform: rotateY(180deg);
-}
-
-.flip-front,
-.flip-back {
-  width: 100%;
-  height: 100%;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-}
-
-.flip-back {
-  position: absolute;
-  top: 0;
-  left: 0;
-  transform: rotateY(180deg);
-  z-index: 2;
-}
-
-/* 4. Jenga Tower Animations */
+/* 5. Jenga Tower Animations */
 @keyframes towerShake {
   0%, 100% { transform: rotateX(-22deg) rotateY(45deg) translate3d(0, 0, 0); }
   20%, 60% { transform: rotateX(-22deg) rotateY(42deg) translate3d(-1px, 0, 1px); }
@@ -454,51 +392,6 @@
 
 .tower-shake {
   animation: towerShake 0.12s ease-in-out infinite;
-}
-
-@keyframes toppleLeft {
-  0% {
-    transform: translate(0, 0) rotate(0deg);
-    opacity: 1;
-  }
-  100% {
-    transform: translate(-150px, 300px) rotate(-45deg);
-    opacity: 0;
-  }
-}
-
-@keyframes toppleRight {
-  0% {
-    transform: translate(0, 0) rotate(0deg);
-    opacity: 1;
-  }
-  100% {
-    transform: translate(150px, 300px) rotate(45deg);
-    opacity: 0;
-  }
-}
-
-@keyframes toppleCenter {
-  0% {
-    transform: translate(0, 0) scale(1);
-    opacity: 1;
-  }
-  100% {
-    transform: translate(0, 250px) scale(0.9);
-    opacity: 0;
-  }
-}
-
-.topple-left {
-  animation: toppleLeft 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards !important;
-}
-
-.topple-right {
-  animation: toppleRight 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards !important;
-}
-
-.topple-center {
-  animation: toppleCenter 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards !important;
 }
 
 @keyframes slideUpFade {
@@ -514,4 +407,21 @@
 
 .toast-slide-up {
   animation: slideUpFade 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* 6. 3D Webpage Table Flip CSS Animation */
+.table-flip-active {
+  animation: tableFlipAnimation 3.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  transform-origin: center center;
+  perspective: 1500px;
+  backface-visibility: hidden;
+}
+
+@keyframes tableFlipAnimation {
+  0% { transform: rotate3d(0, 0, 0, 0deg) scale(1); }
+  12% { transform: rotate3d(1, 0.1, -0.05, -20deg) scale(0.96); }
+  28% { transform: rotate3d(1, 0.2, -0.1, 180deg) translateY(-220px) scale(0.85); }
+  38%, 68% { transform: rotate3d(1, 0.25, -0.12, 180deg) translateY(-220px) scale(0.85) translate3d(2px, -2px, 0); } /* shake wobbly */
+  82% { transform: rotate3d(1, 0.1, -0.05, 10deg) translateY(30px) scale(1.02); }
+  100% { transform: rotate3d(0, 0, 0, 0deg) scale(1); }
 }
