@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { supabase, isSupabaseConfigured } from '../lib/supabaseClient';
 import { User, Mail, Phone, Dices, CheckCircle2, AlertCircle, Sparkles, ArrowRight, Check } from 'lucide-react';
 
 const GAME_CATEGORIES = [
@@ -140,8 +141,9 @@ export default function JoinForm() {
     // Submit state animation trigger
     setIsSubmitting(true);
 
-    // Save submission to localStorage safely and simulate API latency
-    setTimeout(() => {
+    // Save submission and simulate API latency
+    setTimeout(async () => {
+      // Local fallback persistent write
       try {
         const stored = localStorage.getItem('icbg_applications');
         const list = stored ? JSON.parse(stored) : [];
@@ -158,6 +160,22 @@ export default function JoinForm() {
       } catch (error) {
         console.warn("Failed to save application to localStorage:", error);
       }
+
+      // Supabase Write
+      if (isSupabaseConfigured) {
+        try {
+          const { error } = await supabase.from('applications').insert([{
+            full_name: formData.fullName.trim(),
+            email: formData.email.trim(),
+            phone: formData.phone.trim(),
+            game_types: formData.gameTypes
+          }]);
+          if (error) throw error;
+        } catch (e) {
+          console.error("Failed to save application to Supabase:", e);
+        }
+      }
+
       setIsSubmitting(false);
       setIsSuccess(true);
     }, 1800);

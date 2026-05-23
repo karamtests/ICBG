@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { supabase, isSupabaseConfigured } from './lib/supabaseClient';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import Philosophy from './components/Philosophy';
@@ -181,6 +182,84 @@ export default function App() {
     } catch { return DEFAULT_IMAGES; }
   });
 
+  // Fetch routines for Supabase
+  const fetchGames = async () => {
+    try {
+      const { data, error } = await supabase.from('extra_games').select('*').order('created_at', { ascending: false });
+      if (error) throw error;
+      if (data) {
+        // Map database naming back to React keys
+        const mapped = data.map(item => ({
+          id: item.id,
+          num: item.num,
+          title: item.title,
+          type: item.type,
+          competition: item.competition,
+          theme: item.theme,
+          players: item.players,
+          time: item.time,
+          year: item.year,
+          expansion: item.expansion,
+          box_img: item.box_img,
+          play_img: item.play_img,
+          how_to_play: item.how_to_play,
+          quick_summary: item.quick_summary,
+          rating: item.rating
+        }));
+        setExtraGames(mapped);
+      }
+    } catch (e) {
+      console.warn("Failed to fetch games from Supabase, falling back to local storage:", e);
+    }
+  };
+
+  const fetchSchedule = async () => {
+    try {
+      const { data, error } = await supabase.from('weekly_schedule').select('*').eq('id', 1).single();
+      if (error) throw error;
+      if (data) {
+        setSchedule({
+          nextHangout: data.next_hangout,
+          thursdayDate: data.thursday_date,
+          fridayDate: data.friday_date,
+          featuredGameTitles: data.featured_game_titles
+        });
+      }
+    } catch (e) {
+      console.warn("Failed to fetch schedule from Supabase, falling back to local storage:", e);
+    }
+  };
+
+  const fetchGallery = async () => {
+    try {
+      const { data, error } = await supabase.from('gallery_images').select('*').order('created_at', { ascending: true });
+      if (error) throw error;
+      if (data && data.length > 0) {
+        // Map database naming back to React keys
+        const mapped = data.map(item => ({
+          id: item.id,
+          src: item.src,
+          title: item.title,
+          category: item.category,
+          aspect: item.aspect,
+          desc: item.description
+        }));
+        setGalleryImages(mapped);
+      }
+    } catch (e) {
+      console.warn("Failed to fetch gallery from Supabase, falling back to local storage:", e);
+    }
+  };
+
+  // Sync with Supabase on mount if keys are configured
+  useEffect(() => {
+    if (isSupabaseConfigured) {
+      fetchGames();
+      fetchSchedule();
+      fetchGallery();
+    }
+  }, []);
+
   // Safe helper to write to localStorage to prevent quota and incognito crashes
   const safeSetItem = (key, value) => {
     try {
@@ -194,37 +273,135 @@ export default function App() {
   const allGames = [...extraGames, ...gamesData];
 
   // Handler to add a new board game (admin only)
-  const handleAddGame = (newGame) => {
+  const handleAddGame = async (newGame) => {
     const updated = [newGame, ...extraGames];
     setExtraGames(updated);
     safeSetItem('icbg_extra_games', JSON.stringify(updated));
+
+    if (isSupabaseConfigured) {
+      try {
+        const { error } = await supabase.from('extra_games').insert([{
+          num: newGame.num,
+          title: newGame.title,
+          type: newGame.type,
+          competition: newGame.competition,
+          theme: newGame.theme,
+          players: newGame.players,
+          time: newGame.time,
+          year: newGame.year,
+          expansion: newGame.expansion,
+          box_img: newGame.box_img || '',
+          play_img: newGame.play_img || '',
+          how_to_play: newGame.how_to_play || '',
+          quick_summary: newGame.quick_summary || '',
+          rating: newGame.rating || ''
+        }]);
+        if (error) throw error;
+        fetchGames(); // Refresh to obtain actual database IDs
+      } catch (e) {
+        console.error("Supabase handleAddGame error:", e);
+      }
+    }
   };
 
   // Handler to update the weekly campaign schedule
-  const handleUpdateSchedule = (newSchedule) => {
+  const handleUpdateSchedule = async (newSchedule) => {
     setSchedule(newSchedule);
     safeSetItem('icbg_weekly_schedule', JSON.stringify(newSchedule));
+
+    if (isSupabaseConfigured) {
+      try {
+        const { error } = await supabase.from('weekly_schedule').upsert({
+          id: 1,
+          next_hangout: newSchedule.nextHangout,
+          thursday_date: newSchedule.thursdayDate,
+          friday_date: newSchedule.fridayDate,
+          featured_game_titles: newSchedule.featuredGameTitles,
+          updated_at: new Date().toISOString()
+        });
+        if (error) throw error;
+      } catch (e) {
+        console.error("Supabase handleUpdateSchedule error:", e);
+      }
+    }
   };
 
   // Handler to add a gallery image
-  const handleAddGalleryImage = (newImage) => {
+  const handleAddGalleryImage = async (newImage) => {
     const updated = [...galleryImages, newImage];
     setGalleryImages(updated);
     safeSetItem('icbg_gallery_images', JSON.stringify(updated));
+
+    if (isSupabaseConfigured) {
+      try {
+        const { error } = await supabase.from('gallery_images').insert([{
+          src: newImage.src,
+          title: newImage.title,
+          category: newImage.category,
+          aspect: newImage.aspect,
+          description: newImage.desc
+        }]);
+        if (error) throw error;
+        fetchGallery();
+      } catch (e) {
+        console.error("Supabase handleAddGalleryImage error:", e);
+      }
+    }
   };
 
   // Handler to remove a gallery image by index
-  const handleRemoveGalleryImage = (index) => {
+  const handleRemoveGalleryImage = async (index) => {
+    const imgToRemove = galleryImages[index];
     const updated = galleryImages.filter((_, i) => i !== index);
     setGalleryImages(updated);
     safeSetItem('icbg_gallery_images', JSON.stringify(updated));
+
+    if (isSupabaseConfigured) {
+      try {
+        if (imgToRemove.id) {
+          const { error } = await supabase.from('gallery_images').delete().eq('id', imgToRemove.id);
+          if (error) throw error;
+        } else {
+          const { error } = await supabase.from('gallery_images').delete().eq('src', imgToRemove.src).eq('title', imgToRemove.title);
+          if (error) throw error;
+        }
+      } catch (e) {
+        console.error("Supabase handleRemoveGalleryImage error:", e);
+      }
+    }
   };
 
   // Handler to update a gallery image by index
-  const handleUpdateGalleryImage = (index, updatedImage) => {
+  const handleUpdateGalleryImage = async (index, updatedImage) => {
     const updated = galleryImages.map((img, i) => i === index ? updatedImage : img);
     setGalleryImages(updated);
     safeSetItem('icbg_gallery_images', JSON.stringify(updated));
+
+    if (isSupabaseConfigured) {
+      try {
+        if (updatedImage.id) {
+          const { error } = await supabase.from('gallery_images').update({
+            src: updatedImage.src,
+            title: updatedImage.title,
+            category: updatedImage.category,
+            aspect: updatedImage.aspect,
+            description: updatedImage.desc
+          }).eq('id', updatedImage.id);
+          if (error) throw error;
+        } else {
+          const { error } = await supabase.from('gallery_images').update({
+            src: updatedImage.src,
+            title: updatedImage.title,
+            category: updatedImage.category,
+            aspect: updatedImage.aspect,
+            description: updatedImage.desc
+          }).eq('src', updatedImage.src);
+          if (error) throw error;
+        }
+      } catch (e) {
+        console.error("Supabase handleUpdateGalleryImage error:", e);
+      }
+    }
   };
 
   // Smooth scroll helper
