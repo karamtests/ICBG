@@ -265,12 +265,34 @@ export default function App() {
 
   // All games = base JSON merged with admin-added overrides and new games
   const allGames = React.useMemo(() => {
-    // Start with a copy of static games
+    // 1. Normalize and deduplicate extraGames (latest write/creation wins)
+    const uniqueExtraGames = [];
+    const seenTitles = new Set();
+    const seenNums = new Set();
+
+    extraGames.forEach(game => {
+      const titleKey = game.title ? game.title.trim().toLowerCase() : '';
+      const numKey = game.num ? String(game.num).trim() : '';
+      
+      // Since they are sorted descending by created_at, the first one seen is the most recent
+      if (titleKey && !seenTitles.has(titleKey) && (!numKey || !seenNums.has(numKey))) {
+        uniqueExtraGames.push(game);
+        seenTitles.add(titleKey);
+        if (numKey) seenNums.add(numKey);
+      }
+    });
+
+    // 2. Start with a copy of static games and merge overrides
     const merged = gamesData.map(staticGame => {
-      const override = extraGames.find(g => 
-        (g.num && String(g.num) === String(staticGame.num)) || 
-        (g.title && g.title.toLowerCase() === staticGame.title.toLowerCase())
-      );
+      const staticTitleNormalized = staticGame.title ? staticGame.title.trim().toLowerCase() : '';
+      const staticNum = staticGame.num ? String(staticGame.num).trim() : '';
+
+      const override = uniqueExtraGames.find(g => {
+        const gTitleNormalized = g.title ? g.title.trim().toLowerCase() : '';
+        const gNum = g.num ? String(g.num).trim() : '';
+        return (gNum && gNum === staticNum) || (gTitleNormalized && gTitleNormalized === staticTitleNormalized);
+      });
+
       if (override) {
         return {
           ...staticGame,
@@ -281,13 +303,17 @@ export default function App() {
       return staticGame;
     });
 
-    // Add completely new extra games that do not match any static game
-    const newGames = extraGames.filter(g => 
-      !gamesData.some(staticGame => 
-        (g.num && String(g.num) === String(staticGame.num)) || 
-        (g.title && g.title.toLowerCase() === staticGame.title.toLowerCase())
-      )
-    );
+    // 3. Add completely new extra games that do not match any static game
+    const newGames = uniqueExtraGames.filter(g => {
+      const gTitleNormalized = g.title ? g.title.trim().toLowerCase() : '';
+      const gNum = g.num ? String(g.num).trim() : '';
+
+      return !gamesData.some(staticGame => {
+        const staticTitleNormalized = staticGame.title ? staticGame.title.trim().toLowerCase() : '';
+        const staticNum = staticGame.num ? String(staticGame.num).trim() : '';
+        return (gNum && gNum === staticNum) || (gTitleNormalized && gTitleNormalized === staticTitleNormalized);
+      });
+    });
 
     return [...newGames, ...merged];
   }, [extraGames]);
