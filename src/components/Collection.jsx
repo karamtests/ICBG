@@ -84,7 +84,7 @@ const GameCard = React.memo(function GameCard({ game, index, getCleanLink, handl
                   src={game.box_img || game.play_img}
                   alt={game.title}
                   onError={(e) => handleImageError(e, game.title)}
-                  className="max-w-full max-h-full object-contain filter drop-shadow-md transition-transform duration-500 group-hover:scale-105"
+                  className="w-full h-full object-contain filter drop-shadow-md transition-transform duration-500 group-hover:scale-105"
                   loading="lazy"
                 />
               ) : (
@@ -278,8 +278,60 @@ export default function Collection({ extraGames = [] }) {
   const [activeType, setActiveType] = useState('All');
   const [activeComp, setActiveComp] = useState('All');
 
-  // Merge the original JSON data with any admin-added games
-  const allGames = useMemo(() => [...extraGames, ...gamesData], [extraGames]);
+  // Merge the original JSON data with any admin-added games and deduplicate/normalize
+  const allGames = useMemo(() => {
+    // 1. Normalize and deduplicate extraGames (latest write/creation wins)
+    const uniqueExtraGames = [];
+    const seenTitles = new Set();
+    const seenNums = new Set();
+
+    extraGames.forEach(game => {
+      const titleKey = game.title ? game.title.trim().toLowerCase() : '';
+      const numKey = game.num ? String(game.num).trim() : '';
+      
+      // Since they are sorted descending by created_at, the first one seen is the most recent
+      if (titleKey && !seenTitles.has(titleKey) && (!numKey || !seenNums.has(numKey))) {
+        uniqueExtraGames.push(game);
+        seenTitles.add(titleKey);
+        if (numKey) seenNums.add(numKey);
+      }
+    });
+
+    // 2. Start with a copy of static games and merge overrides
+    const merged = gamesData.map(staticGame => {
+      const staticTitleNormalized = staticGame.title ? staticGame.title.trim().toLowerCase() : '';
+      const staticNum = staticGame.num ? String(staticGame.num).trim() : '';
+
+      const override = uniqueExtraGames.find(g => {
+        const gTitleNormalized = g.title ? g.title.trim().toLowerCase() : '';
+        const gNum = g.num ? String(g.num).trim() : '';
+        return (gNum && gNum === staticNum) || (gTitleNormalized && gTitleNormalized === staticTitleNormalized);
+      });
+
+      if (override) {
+        return {
+          ...staticGame,
+          ...override, // override with database fields
+          id: override.id // preserve the db id for updates
+        };
+      }
+      return staticGame;
+    });
+
+    // 3. Add completely new extra games that do not match any static game
+    const newGames = uniqueExtraGames.filter(g => {
+      const gTitleNormalized = g.title ? g.title.trim().toLowerCase() : '';
+      const gNum = g.num ? String(g.num).trim() : '';
+
+      return !gamesData.some(staticGame => {
+        const staticTitleNormalized = staticGame.title ? staticGame.title.trim().toLowerCase() : '';
+        const staticNum = staticGame.num ? String(staticGame.num).trim() : '';
+        return (gNum && gNum === staticNum) || (gTitleNormalized && gTitleNormalized === staticTitleNormalized);
+      });
+    });
+
+    return [...newGames, ...merged];
+  }, [extraGames]);
 
   // Available game types derived from data
   const gameTypes = ['All', 'Social', 'Easy', 'Light', 'Medium', 'Heavy'];

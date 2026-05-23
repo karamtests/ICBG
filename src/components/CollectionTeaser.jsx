@@ -105,7 +105,7 @@ export default function CollectionTeaser({ onNavigateToFullCollection }) {
                     <img
                       src={game.box_img}
                       alt={game.title}
-                      className="max-w-full max-h-full object-contain filter drop-shadow-md transition-transform duration-500 group-hover:scale-105"
+                      className="w-full h-full object-contain filter drop-shadow-md transition-transform duration-500 group-hover:scale-105"
                       loading="lazy"
                     />
                   </div>
