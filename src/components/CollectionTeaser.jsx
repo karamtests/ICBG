@@ -10,7 +10,7 @@ const TEASER_GAMES = [
     players: "3-4 Players",
     time: "60-120 Min",
     theme: "Resource Management & Negotiation Strategy",
-    box_img: "https://cf.geekdo-images.com/W3BsDEv1g_68n0mOsbv9Ww__itemrep/img/o8v4SIoEEEXC4qKm8EH6Zwo479w=/fit-in/246x300/filters:strip_icc()/pic2419375.jpg",
+    box_img: "/assets/images/collection/unnamed(60).png",
     num: "1",
     tagline: "The modern classic of resource bargaining."
   },
@@ -20,7 +20,7 @@ const TEASER_GAMES = [
     players: "5-10 Players",
     time: "45 Min",
     theme: "Social Deduction, Political Distrust & Fabrications",
-    box_img: "https://cf.geekdo-images.com/R8vR3uO5KWKhyZ6qSKUIvA__itemrep/img/T_asM6TqGdrK2crN56gbP4m7Gus=/fit-in/246x300/filters:strip_icc()/pic3162711.jpg",
+    box_img: "/assets/images/collection/unnamed(16).png",
     num: "5",
     tagline: "A psychological masterclass in political theater."
   },
@@ -30,7 +30,7 @@ const TEASER_GAMES = [
     players: "3-6 Players",
     time: "30 Min",
     theme: "Abstract Surrealism & Creative Storytelling",
-    box_img: "https://cf.geekdo-images.com/aC87LafzW293v8wH1g0Hbg__itemrep/img/w2Csh7M66sC84b06rJmsM78zZ-M=/fit-in/246x300/filters:strip_icc()/pic6145624.jpg",
+    box_img: "/assets/images/collection/unnamed(4).png",
     num: "10",
     tagline: "Explore the surreal landscapes of shared imagination."
   },
@@ -40,7 +40,7 @@ const TEASER_GAMES = [
     players: "3-5 Players",
     time: "60 Min",
     theme: "Medieval Smuggling, Bluffs & Bribes",
-    box_img: "https://cf.geekdo-images.com/7bA1j8A40Wq3iHw96ZtL4g__itemrep/img/R1T240r66Kq38V6Hms78Z54-M=/fit-in/246x300/filters:strip_icc()/pic2186575.jpg",
+    box_img: "/assets/images/collection/unnamed(18).png",
     num: "6",
     tagline: "Can you bribe and lie your way to fortune?"
   }
