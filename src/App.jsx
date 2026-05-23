@@ -170,31 +170,49 @@ export default function App() {
   // Fetch routines for Supabase
   const fetchGames = async () => {
     try {
-      const { data, error } = await supabase.from('extra_games').select('*').order('created_at', { ascending: false });
-      if (error) throw error;
-      if (data) {
-        // Map database naming back to React keys
-        const mapped = data.map(item => ({
-          id: item.id,
-          num: item.num,
-          title: item.title,
-          type: item.type,
-          competition: item.competition,
-          theme: item.theme,
-          players: item.players,
-          time: item.time,
-          year: item.year,
-          expansion: item.expansion,
-          box_img: item.box_img,
-          play_img: item.play_img,
-          how_to_play: item.how_to_play,
-          quick_summary: item.quick_summary,
-          rating: item.rating
-        }));
-        setExtraGames(mapped);
+      if (isSupabaseConfigured) {
+        const { data, error } = await supabase.from('extra_games').select('*').order('created_at', { ascending: false });
+        if (error) throw error;
+        if (data) {
+          // Map database naming back to React keys
+          const mapped = data.map(item => ({
+            id: item.id,
+            num: item.num,
+            title: item.title,
+            type: item.type,
+            competition: item.competition,
+            theme: item.theme,
+            players: item.players,
+            time: item.time,
+            year: item.year,
+            expansion: item.expansion,
+            box_img: item.box_img,
+            play_img: item.play_img,
+            how_to_play: item.how_to_play,
+            quick_summary: item.quick_summary,
+            rating: item.rating
+          }));
+          setExtraGames(mapped);
+          try {
+            localStorage.setItem('icbg_extra_games', JSON.stringify(mapped));
+          } catch (e) {
+            console.warn("Failed to sync extra games to localStorage:", e);
+          }
+          return;
+        }
       }
     } catch (e) {
       console.warn("Failed to fetch games from Supabase, falling back to local storage:", e);
+    }
+
+    // Fallback to localStorage if Supabase is offline/unconfigured
+    try {
+      const stored = localStorage.getItem('icbg_extra_games');
+      if (stored) {
+        setExtraGames(JSON.parse(stored));
+      }
+    } catch (err) {
+      console.warn("Failed to load cached games from localStorage:", err);
     }
   };
 
@@ -236,22 +254,54 @@ export default function App() {
     }
   };
 
-  // Sync with Supabase on mount if keys are configured
+  // Sync with Supabase on mount
   useEffect(() => {
+    fetchGames(); // Always run so it checks Supabase first and then falls back to localStorage
     if (isSupabaseConfigured) {
-      fetchGames();
       fetchSchedule();
       fetchGallery();
     }
   }, []);
 
-  // All games = base JSON + admin-added
-  const allGames = [...extraGames, ...gamesData];
+  // All games = base JSON merged with admin-added overrides and new games
+  const allGames = React.useMemo(() => {
+    // Start with a copy of static games
+    const merged = gamesData.map(staticGame => {
+      const override = extraGames.find(g => 
+        (g.num && String(g.num) === String(staticGame.num)) || 
+        (g.title && g.title.toLowerCase() === staticGame.title.toLowerCase())
+      );
+      if (override) {
+        return {
+          ...staticGame,
+          ...override, // override with database fields
+          id: override.id // preserve the db id for updates
+        };
+      }
+      return staticGame;
+    });
+
+    // Add completely new extra games that do not match any static game
+    const newGames = extraGames.filter(g => 
+      !gamesData.some(staticGame => 
+        (g.num && String(g.num) === String(staticGame.num)) || 
+        (g.title && g.title.toLowerCase() === staticGame.title.toLowerCase())
+      )
+    );
+
+    return [...newGames, ...merged];
+  }, [extraGames]);
 
   // Handler to add a new board game (admin only)
   const handleAddGame = async (newGame) => {
     const updated = [newGame, ...extraGames];
     setExtraGames(updated);
+
+    try {
+      localStorage.setItem('icbg_extra_games', JSON.stringify(updated));
+    } catch (e) {
+      console.warn("Failed to cache games in localStorage:", e);
+    }
 
     if (isSupabaseConfigured) {
       try {
@@ -275,6 +325,106 @@ export default function App() {
         fetchGames(); // Refresh to obtain actual database IDs
       } catch (e) {
         console.error("Supabase handleAddGame error:", e);
+      }
+    }
+  };
+
+  // Handler to update an existing board game or static override (admin only)
+  const handleUpdateGame = async (updatedGame) => {
+    let updated;
+    const existsInExtra = extraGames.some(g => 
+      (g.id && g.id === updatedGame.id) || 
+      (g.num && String(g.num) === String(updatedGame.num)) ||
+      (g.title && g.title.toLowerCase() === updatedGame.title.toLowerCase())
+    );
+
+    if (existsInExtra) {
+      updated = extraGames.map(g => {
+        const isMatch = (g.id && g.id === updatedGame.id) || 
+                        (g.num && String(g.num) === String(updatedGame.num)) ||
+                        (g.title && g.title.toLowerCase() === updatedGame.title.toLowerCase());
+        return isMatch ? { ...g, ...updatedGame } : g;
+      });
+    } else {
+      updated = [updatedGame, ...extraGames];
+    }
+    setExtraGames(updated);
+
+    try {
+      localStorage.setItem('icbg_extra_games', JSON.stringify(updated));
+    } catch (e) {
+      console.warn("Failed to cache games in localStorage:", e);
+    }
+
+    if (isSupabaseConfigured) {
+      try {
+        if (updatedGame.id) {
+          const { error } = await supabase.from('extra_games').update({
+            num: updatedGame.num,
+            title: updatedGame.title,
+            type: updatedGame.type,
+            competition: updatedGame.competition,
+            theme: updatedGame.theme,
+            players: updatedGame.players,
+            time: updatedGame.time,
+            year: updatedGame.year,
+            expansion: updatedGame.expansion,
+            box_img: updatedGame.box_img || '',
+            play_img: updatedGame.play_img || '',
+            how_to_play: updatedGame.how_to_play || '',
+            quick_summary: updatedGame.quick_summary || '',
+            rating: updatedGame.rating || ''
+          }).eq('id', updatedGame.id);
+          if (error) throw error;
+        } else {
+          // Check if there is already an override in the database matching by num or title
+          const { data, error: findError } = await supabase
+            .from('extra_games')
+            .select('id')
+            .or(`num.eq.${updatedGame.num},title.eq.${updatedGame.title}`)
+            .maybeSingle();
+
+          if (!findError && data && data.id) {
+            const { error } = await supabase.from('extra_games').update({
+              num: updatedGame.num,
+              title: updatedGame.title,
+              type: updatedGame.type,
+              competition: updatedGame.competition,
+              theme: updatedGame.theme,
+              players: updatedGame.players,
+              time: updatedGame.time,
+              year: updatedGame.year,
+              expansion: updatedGame.expansion,
+              box_img: updatedGame.box_img || '',
+              play_img: updatedGame.play_img || '',
+              how_to_play: updatedGame.how_to_play || '',
+              quick_summary: updatedGame.quick_summary || '',
+              rating: updatedGame.rating || ''
+            }).eq('id', data.id);
+            if (error) throw error;
+          } else {
+            const { error } = await supabase.from('extra_games').insert([{
+              num: updatedGame.num,
+              title: updatedGame.title,
+              type: updatedGame.type,
+              competition: updatedGame.competition,
+              theme: updatedGame.theme,
+              players: updatedGame.players,
+              time: updatedGame.time,
+              year: updatedGame.year,
+              expansion: updatedGame.expansion,
+              box_img: updatedGame.box_img || '',
+              play_img: updatedGame.play_img || '',
+              how_to_play: updatedGame.how_to_play || '',
+              quick_summary: updatedGame.quick_summary || '',
+              rating: updatedGame.rating || ''
+            }]);
+            if (error) throw error;
+          }
+        }
+        fetchGames(); // Refresh to obtain actual database IDs
+      } catch (e) {
+        console.error("Supabase handleUpdateGame error:", e);
       }
     }
   };
@@ -462,6 +612,7 @@ export default function App() {
         onClose={() => setIsAdminOpen(false)} 
         games={allGames} 
         onAddGame={handleAddGame}
+        onUpdateGame={handleUpdateGame}
         schedule={schedule}
         onUpdateSchedule={handleUpdateSchedule}
         galleryImages={galleryImages}

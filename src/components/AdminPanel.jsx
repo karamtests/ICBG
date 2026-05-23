@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { supabase, isSupabaseConfigured } from '../lib/supabaseClient';
 import { Lock, Unlock, X, Plus, Calendar, Save, Search, Check, Sparkles, Film, Play, Eye, Image as ImageIcon, Trash2, Pencil, Dices, Upload, Loader2 } from 'lucide-react';
 
-export default function AdminPanel({ isOpen, onClose, games, onAddGame, schedule, onUpdateSchedule, galleryImages, onAddGalleryImage, onRemoveGalleryImage, onUpdateGalleryImage }) {
+export default function AdminPanel({ isOpen, onClose, games, onAddGame, onUpdateGame, schedule, onUpdateSchedule, galleryImages, onAddGalleryImage, onRemoveGalleryImage, onUpdateGalleryImage }) {
   const [passcode, setPasscode] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [authError, setAuthError] = useState('');
@@ -46,6 +46,98 @@ export default function AdminPanel({ isOpen, onClose, games, onAddGame, schedule
   // Gallery Editing states & helpers
   const [editingImageIndex, setEditingImageIndex] = useState(null);
 
+  // Game Management / Editing State
+  const [editingGame, setEditingGame] = useState(null);
+  const [manageGameSearch, setManageGameSearch] = useState('');
+  const [editGameTitle, setEditGameTitle] = useState('');
+  const [editGameType, setEditGameType] = useState('Light');
+  const [editGameComp, setEditGameComp] = useState('Competitive');
+  const [editGameTheme, setEditGameTheme] = useState('');
+  const [editGamePlayers, setEditGamePlayers] = useState('');
+  const [editGameTime, setEditGameTime] = useState('');
+  const [editGameYear, setEditGameYear] = useState('');
+  const [editGameExpansion, setEditGameExpansion] = useState('None');
+  const [editGameHowToPlay, setEditGameHowToPlay] = useState('');
+  const [editGameQuickSummary, setEditGameQuickSummary] = useState('');
+  const [editGameBoxImg, setEditGameBoxImg] = useState('');
+  const [isUploadingEditGame, setIsUploadingEditGame] = useState(false);
+  const [editGameUploadError, setEditGameUploadError] = useState('');
+
+  const handleStartEditGame = (game) => {
+    setEditingGame(game);
+    setEditGameTitle(game.title || '');
+    setEditGameType(game.type || 'Light');
+    setEditGameComp(game.competition || 'Competitive');
+    setEditGameTheme(game.theme || '');
+    setEditGamePlayers(game.players || '');
+    setEditGameTime(game.time || '');
+    setEditGameYear(game.year || '');
+    setEditGameExpansion(game.expansion || 'None');
+    setEditGameHowToPlay(game.how_to_play || '');
+    setEditGameQuickSummary(game.quick_summary || '');
+    setEditGameBoxImg(game.box_img || '');
+    setEditGameUploadError('');
+  };
+
+  const handleCancelEditGame = () => {
+    setEditingGame(null);
+  };
+
+  const handleEditGameImageFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setIsUploadingEditGame(true);
+    setEditGameUploadError('');
+
+    try {
+      const publicUrl = await uploadMedia(file, 'games');
+      setEditGameBoxImg(publicUrl);
+    } catch (err) {
+      console.error("Edit game image upload error:", err);
+      setEditGameUploadError(err.message || 'Failed to upload image file.');
+    } finally {
+      setIsUploadingEditGame(false);
+    }
+  };
+
+  const handleEditGameSubmit = (e) => {
+    e.preventDefault();
+    if (!editGameTitle || !editingGame) return;
+
+    // Validate How-to-play URL
+    if (editGameHowToPlay && !isValidUrl(editGameHowToPlay)) {
+      alert('Please enter a valid YouTube tutorial URL (starting with http:// or https://)');
+      return;
+    }
+
+    // Validate Quick Summary URL
+    if (editGameQuickSummary && !isValidUrl(editGameQuickSummary)) {
+      alert('Please enter a valid Quick Summary URL (starting with http:// or https://)');
+      return;
+    }
+
+    const updatedGameObj = {
+      ...editingGame,
+      title: editGameTitle,
+      type: editGameType,
+      competition: editGameComp,
+      theme: editGameTheme,
+      players: editGamePlayers,
+      time: editGameTime,
+      year: editGameYear,
+      expansion: editGameExpansion,
+      box_img: editGameBoxImg,
+      how_to_play: editGameHowToPlay,
+      quick_summary: editGameQuickSummary
+    };
+
+    onUpdateGame(updatedGameObj);
+    setFormSuccess(`Successfully updated "${editGameTitle}" in the Atelier vault!`);
+    setEditingGame(null);
+    setTimeout(() => setFormSuccess(''), 3000);
+  };
+
   const clearGalleryForm = () => {
     setGalleryUrl('');
     setGalleryTitle('');
@@ -79,6 +171,7 @@ export default function AdminPanel({ isOpen, onClose, games, onAddGame, schedule
       setPasscode('');
       setAuthError('');
       clearGalleryForm();
+      setEditingGame(null);
     }
   }, [isOpen, schedule]);
 
@@ -375,6 +468,18 @@ export default function AdminPanel({ isOpen, onClose, games, onAddGame, schedule
               >
                 Archive New Game
                 {activeTab === 'addGame' && (
+                  <div className="absolute bottom-0 left-6 right-6 h-[2px] bg-[#f8b146]" />
+                )}
+              </button>
+
+              <button
+                onClick={() => { setActiveTab('manageGames'); setFormSuccess(''); }}
+                className={`px-6 py-4 font-mono text-xs uppercase tracking-widest relative transition-all duration-300 cursor-pointer ${
+                  activeTab === 'manageGames' ? 'text-[#f8b146] font-bold' : 'text-[#C8B1CC] hover:text-white'
+                }`}
+              >
+                Manage Games
+                {activeTab === 'manageGames' && (
                   <div className="absolute bottom-0 left-6 right-6 h-[2px] bg-[#f8b146]" />
                 )}
               </button>
@@ -738,6 +843,333 @@ export default function AdminPanel({ isOpen, onClose, games, onAddGame, schedule
                     </button>
                   </div>
                 </form>
+              ) : activeTab === 'manageGames' ? (
+                /* TAB: MANAGE GAMES & COVER IMAGES */
+                <div className="space-y-6 text-left">
+                  {editingGame ? (
+                    /* Edit Sub-View */
+                    <form onSubmit={handleEditGameSubmit} className="space-y-6 bg-[#25102a]/30 border border-white/10 rounded-3xl p-6 md:p-8">
+                      <div className="flex items-center justify-between border-b border-white/10 pb-4 mb-4">
+                        <div>
+                          <span className="font-mono text-[9px] uppercase tracking-[0.15em] text-[#f8b146] font-bold block">
+                            Atelier Vault Editor
+                          </span>
+                          <h4 className="font-sans font-black text-lg text-white">
+                            Editing Cover & Details: {editingGame.title}
+                          </h4>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={handleCancelEditGame}
+                          className="py-1.5 px-4 rounded-full border border-white/10 hover:border-[#f8b146]/40 text-[#C8B1CC] hover:text-white transition-all text-xs font-semibold cursor-pointer"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {/* Game Title */}
+                        <div className="flex flex-col gap-2">
+                          <label className="font-mono text-[9px] uppercase tracking-wider text-[#C8B1CC]/80">Game Title *</label>
+                          <input
+                            type="text"
+                            value={editGameTitle}
+                            onChange={(e) => setEditGameTitle(e.target.value)}
+                            placeholder="e.g. Scythe"
+                            className="py-3 px-4 bg-[#25102a]/60 border border-white/15 focus:border-[#f8b146] rounded-2xl font-sans text-xs text-white placeholder-white/30 focus:outline-none transition-all duration-300"
+                            required
+                          />
+                        </div>
+
+                        {/* Complexity Type Dropdown */}
+                        <div className="flex flex-col gap-2">
+                          <label className="font-mono text-[9px] uppercase tracking-wider text-[#C8B1CC]/80">Complexity Classification</label>
+                          <select
+                            value={editGameType}
+                            onChange={(e) => setEditGameType(e.target.value)}
+                            className="py-3 px-4 bg-[#25102a]/90 border border-white/15 focus:border-[#f8b146] rounded-2xl font-sans text-xs text-white focus:outline-none transition-all duration-300 cursor-pointer"
+                          >
+                            <option value="Social" className="bg-[#25102a] text-white">Social</option>
+                            <option value="Easy" className="bg-[#25102a] text-white">Easy</option>
+                            <option value="Light" className="bg-[#25102a] text-white">Light</option>
+                            <option value="Medium" className="bg-[#25102a] text-white">Medium</option>
+                            <option value="Heavy" className="bg-[#25102a] text-white">Heavy</option>
+                          </select>
+                        </div>
+
+                        {/* Format Strategy (Competition) */}
+                        <div className="flex flex-col gap-2">
+                          <label className="font-mono text-[9px] uppercase tracking-wider text-[#C8B1CC]/80">Competition Format</label>
+                          <select
+                            value={editGameComp}
+                            onChange={(e) => setEditGameComp(e.target.value)}
+                            className="py-3 px-4 bg-[#25102a]/90 border border-white/15 focus:border-[#f8b146] rounded-2xl font-sans text-xs text-white focus:outline-none transition-all duration-300 cursor-pointer"
+                          >
+                            <option value="Competitive" className="bg-[#25102a] text-white">Competitive</option>
+                            <option value="Cooperative" className="bg-[#25102a] text-white">Cooperative</option>
+                          </select>
+                        </div>
+
+                        {/* Themes */}
+                        <div className="flex flex-col gap-2">
+                          <label className="font-mono text-[9px] uppercase tracking-wider text-[#C8B1CC]/80">Theme / Mechanics</label>
+                          <input
+                            type="text"
+                            value={editGameTheme}
+                            onChange={(e) => setEditGameTheme(e.target.value)}
+                            placeholder="e.g. Strategy, Resource Management"
+                            className="py-3 px-4 bg-[#25102a]/60 border border-white/15 focus:border-[#f8b146] rounded-2xl font-sans text-xs text-white placeholder-white/30 focus:outline-none transition-all duration-300"
+                          />
+                        </div>
+
+                        {/* Players count */}
+                        <div className="flex flex-col gap-2">
+                          <label className="font-mono text-[9px] uppercase tracking-wider text-[#C8B1CC]/80">Players Count</label>
+                          <input
+                            type="text"
+                            value={editGamePlayers}
+                            onChange={(e) => setEditGamePlayers(e.target.value)}
+                            placeholder="e.g. 1 - 5"
+                            className="py-3 px-4 bg-[#25102a]/60 border border-white/15 focus:border-[#f8b146] rounded-2xl font-sans text-xs text-white placeholder-white/30 focus:outline-none transition-all duration-300"
+                          />
+                        </div>
+
+                        {/* Playtime */}
+                        <div className="flex flex-col gap-2">
+                          <label className="font-mono text-[9px] uppercase tracking-wider text-[#C8B1CC]/80">Playtime</label>
+                          <input
+                            type="text"
+                            value={editGameTime}
+                            onChange={(e) => setEditGameTime(e.target.value)}
+                            placeholder="e.g. 90 - 115 Min"
+                            className="py-3 px-4 bg-[#25102a]/60 border border-white/15 focus:border-[#f8b146] rounded-2xl font-sans text-xs text-white placeholder-white/30 focus:outline-none transition-all duration-300"
+                          />
+                        </div>
+
+                        {/* Year */}
+                        <div className="flex flex-col gap-2">
+                          <label className="font-mono text-[9px] uppercase tracking-wider text-[#C8B1CC]/80">Release Year</label>
+                          <input
+                            type="text"
+                            value={editGameYear}
+                            onChange={(e) => setEditGameYear(e.target.value)}
+                            placeholder="e.g. 2016"
+                            className="py-3 px-4 bg-[#25102a]/60 border border-white/15 focus:border-[#f8b146] rounded-2xl font-sans text-xs text-white placeholder-white/30 focus:outline-none transition-all duration-300"
+                          />
+                        </div>
+
+                        {/* Expansion */}
+                        <div className="flex flex-col gap-2">
+                          <label className="font-mono text-[9px] uppercase tracking-wider text-[#C8B1CC]/80">Expansion</label>
+                          <input
+                            type="text"
+                            value={editGameExpansion}
+                            onChange={(e) => setEditGameExpansion(e.target.value)}
+                            placeholder="e.g. None"
+                            className="py-3 px-4 bg-[#25102a]/60 border border-white/15 focus:border-[#f8b146] rounded-2xl font-sans text-xs text-white placeholder-white/30 focus:outline-none transition-all duration-300"
+                          />
+                        </div>
+
+                        {/* How to play video link */}
+                        <div className="flex flex-col gap-2">
+                          <label className="font-mono text-[9px] flex items-center gap-1 uppercase tracking-wider text-[#C8B1CC]/80">
+                            <Play size={10} className="text-[#f8b146]" /> How-To-Play YouTube Link
+                          </label>
+                          <input
+                            type="url"
+                            value={editGameHowToPlay}
+                            onChange={(e) => setEditGameHowToPlay(e.target.value)}
+                            placeholder="YouTube tutorial URL"
+                            className="py-3 px-4 bg-[#25102a]/60 border border-white/15 focus:border-[#f8b146] rounded-2xl font-sans text-xs text-white placeholder-white/30 focus:outline-none transition-all duration-300"
+                          />
+                        </div>
+
+                        {/* Quick Summary video link */}
+                        <div className="flex flex-col gap-2">
+                          <label className="font-mono text-[9px] flex items-center gap-1 uppercase tracking-wider text-[#C8B1CC]/80">
+                            <Film size={10} className="text-[#f8b146]" /> Quick Summary YouTube Link
+                          </label>
+                          <input
+                            type="url"
+                            value={editGameQuickSummary}
+                            onChange={(e) => setEditGameQuickSummary(e.target.value)}
+                            placeholder="YouTube summary URL"
+                            className="py-3 px-4 bg-[#25102a]/60 border border-white/15 focus:border-[#f8b146] rounded-2xl font-sans text-xs text-white placeholder-white/30 focus:outline-none transition-all duration-300"
+                          />
+                        </div>
+
+                        {/* Box Image Upload / Direct Link Input */}
+                        <div className="flex flex-col gap-2 col-span-1 md:col-span-2 border-t border-white/10 pt-4 mt-2">
+                          <label className="font-mono text-[9px] flex items-center gap-1 uppercase tracking-wider text-[#C8B1CC]/80">
+                            <ImageIcon size={10} className="text-[#f8b146]" /> Cover image file upload (Supabase Bucket) or Image URL
+                          </label>
+                          <div className="flex flex-col sm:flex-row gap-4 items-center bg-[#25102a]/45 border border-white/10 p-4 rounded-2xl">
+                            <div className="flex-1 w-full text-left">
+                              <input
+                                type="file"
+                                accept="image/*"
+                                onChange={handleEditGameImageFileChange}
+                                disabled={isUploadingEditGame}
+                                className="hidden"
+                                id="edit-game-image-upload"
+                              />
+                              <label
+                                htmlFor="edit-game-image-upload"
+                                className={`flex items-center justify-center gap-2 py-3 px-6 rounded-xl border border-dashed transition-all duration-300 cursor-pointer font-sans text-xs font-semibold text-center ${
+                                  isUploadingEditGame
+                                    ? 'bg-white/5 border-white/10 text-white/40 cursor-not-allowed'
+                                    : 'bg-[#f8b146]/5 border-[#f8b146]/30 text-[#f8b146] hover:bg-[#f8b146]/10 hover:border-[#f8b146]/50 shadow-sm shadow-[#f8b146]/5'
+                                }`}
+                              >
+                                {isUploadingEditGame ? (
+                                  <>
+                                    <Loader2 size={14} className="animate-spin text-[#f8b146]" />
+                                    Uploading cover...
+                                  </>
+                                ) : (
+                                  <>
+                                    <Upload size={14} />
+                                    Upload New Cover Photo
+                                  </>
+                                )}
+                              </label>
+                              {editGameUploadError && (
+                                <p className="text-[10px] text-red-400 mt-2 font-sans">{editGameUploadError}</p>
+                              )}
+                              <div className="mt-3">
+                                <input
+                                  type="url"
+                                  placeholder="Or paste an external Image URL instead..."
+                                  value={editGameBoxImg}
+                                  onChange={(e) => setEditGameBoxImg(e.target.value)}
+                                  className="w-full py-2.5 px-4 bg-[#25102a]/60 border border-white/15 focus:border-[#f8b146] rounded-xl font-sans text-xs text-white placeholder-white/30 focus:outline-none transition-all"
+                                />
+                              </div>
+                            </div>
+                            
+                            {editGameBoxImg ? (
+                              <div className="w-24 h-24 rounded-xl overflow-hidden border border-white/15 bg-cover bg-center shrink-0 shadow-inner relative group" style={{ backgroundImage: `url(${editGameBoxImg})` }}>
+                                <div className="absolute inset-0 bg-[#25102a]/70 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                                  <button
+                                    type="button"
+                                    onClick={() => setEditGameBoxImg('')}
+                                    className="p-1.5 rounded-full bg-red-500/20 border border-red-500/30 text-red-400 hover:bg-red-500/30 transition-all cursor-pointer"
+                                    title="Remove Image"
+                                  >
+                                    <X size={12} />
+                                  </button>
+                                </div>
+                              </div>
+                            ) : (
+                              <div className="w-24 h-24 rounded-xl border border-dashed border-white/10 flex flex-col items-center justify-center text-white/20 shrink-0 bg-[#25102a]/30">
+                                <ImageIcon size={20} />
+                                <span className="text-[9px] mt-1 font-mono uppercase tracking-wider">No Image</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Submit */}
+                      <div className="border-t border-white/10 pt-6 flex justify-end gap-3">
+                        <button
+                          type="button"
+                          onClick={handleCancelEditGame}
+                          className="px-6 py-3 rounded-full border border-white/10 hover:border-white/25 text-[#C8B1CC] hover:text-white transition-all text-xs font-sans font-bold cursor-pointer"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          type="submit"
+                          className="px-8 py-3 bg-gradient-to-r from-[#f8b146] to-[#f28a75] text-[#3a1d42] rounded-full font-sans font-bold text-xs uppercase tracking-widest shadow-lg shadow-[#f8b146]/15 hover:scale-[1.02] hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-300 flex items-center gap-2 cursor-pointer"
+                        >
+                          <Save size={14} /> Save Game Cover & Details
+                        </button>
+                      </div>
+                    </form>
+                  ) : (
+                    /* Directory List View */
+                    <div className="space-y-4">
+                      {/* Search Bar */}
+                      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/10 pb-4">
+                        <div>
+                          <h4 className="font-sans font-bold text-sm text-white">Board Games Vault Directory</h4>
+                          <p className="font-sans text-[10px] text-[#C8B1CC]">Select any game to upload a new cover image or update its characteristics</p>
+                        </div>
+                        
+                        <div className="relative w-full md:max-w-xs">
+                          <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none text-white/30">
+                            <Search size={14} />
+                          </div>
+                          <input
+                            type="text"
+                            placeholder="Search board games..."
+                            value={manageGameSearch}
+                            onChange={(e) => setManageGameSearch(e.target.value)}
+                            className="w-full py-2.5 pl-11 pr-4 bg-[#25102a]/60 border border-white/15 focus:border-[#f8b146] text-white placeholder-white/30 rounded-xl font-sans text-xs focus:outline-none transition-all duration-300"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Scrollable list */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-h-[480px] overflow-y-auto pr-1">
+                        {games
+                          .filter(game => game.title.toLowerCase().includes(manageGameSearch.toLowerCase()) || game.theme.toLowerCase().includes(manageGameSearch.toLowerCase()))
+                          .map((game, idx) => {
+                            const initials = game.title.split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase();
+                            return (
+                              <div 
+                                key={game.num || idx} 
+                                className="bg-[#25102a]/45 border border-white/8 rounded-[1.8rem] p-4 flex gap-4 items-center justify-between transition-all duration-300 hover:border-[#f8b146]/35"
+                              >
+                                <div className="flex items-center gap-3 overflow-hidden">
+                                  {game.box_img || game.play_img ? (
+                                    <div 
+                                      className="w-12 h-12 rounded-xl bg-cover bg-center bg-[#25102a]/50 border border-white/10 shrink-0" 
+                                      style={{ backgroundImage: `url(${game.box_img || game.play_img})` }} 
+                                    />
+                                  ) : (
+                                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#3a1d42]/40 to-[#25102a]/20 border border-[#f8b146]/20 text-[#f8b146] flex items-center justify-center shrink-0 font-mono text-xs font-black">
+                                      {initials}
+                                    </div>
+                                  )}
+                                  <div className="text-left overflow-hidden">
+                                    <h5 className="font-sans font-bold text-xs text-white truncate max-w-[150px]" title={game.title}>
+                                      {game.title}
+                                    </h5>
+                                    <div className="flex gap-2 items-center mt-1">
+                                      <span className="font-mono text-[8px] uppercase px-1.5 py-0.2 bg-[#f8b146]/10 text-[#f8b146] rounded border border-[#f8b146]/15">
+                                        {game.type}
+                                      </span>
+                                      <span className="font-mono text-[8px] text-[#C8B1CC] font-bold">
+                                        {game.year}
+                                      </span>
+                                    </div>
+                                  </div>
+                                </div>
+
+                                <button
+                                  type="button"
+                                  onClick={() => handleStartEditGame(game)}
+                                  className="p-2.5 rounded-xl border border-white/10 hover:border-[#f8b146]/45 text-[#C8B1CC] hover:text-[#f8b146] bg-white/5 hover:bg-[#f8b146]/5 transition-all duration-300 cursor-pointer shrink-0"
+                                  title="Edit Cover & Details"
+                                >
+                                  <Pencil size={12} />
+                                </button>
+                              </div>
+                            );
+                          })}
+                        
+                        {games.filter(game => game.title.toLowerCase().includes(manageGameSearch.toLowerCase()) || game.theme.toLowerCase().includes(manageGameSearch.toLowerCase())).length === 0 && (
+                          <div className="col-span-full py-12 text-center text-[#C8B1CC]/40 border border-dashed border-white/10 rounded-2xl">
+                            <Dices size={24} className="mx-auto mb-3 opacity-30 animate-bounce" />
+                            <p className="font-sans text-xs">No matching games found in repository.</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
               ) : activeTab === 'gallery' ? (
                 /* TAB 3: GALLERY MANAGEMENT */
                 <div className="space-y-6 text-left">
