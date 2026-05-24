@@ -2,7 +2,80 @@ import React from 'react';
 import { Camera, Image as ImageIcon, MapPin, Trash2 } from 'lucide-react';
 
 // Default hardcoded gallery images
-export const DEFAULT_IMAGES = [];
+export const DEFAULT_IMAGES = [
+  {
+    id: 1,
+    src: "https://images.unsplash.com/photo-1518495973542-4542c06a5843?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    title: "Atelier Morning Vibe",
+    category: "Atelier Vibe",
+    aspect: "aspect-square",
+    desc: "Tactile peace of strategic camaraderie in a quiet setting.",
+    show_on_homepage: true
+  },
+  {
+    id: 2,
+    src: "https://images.unsplash.com/photo-1472396961693-142e6e269027?q=80&w=2152&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    title: "Tactical Exploration",
+    category: "Community",
+    aspect: "aspect-[3/4]",
+    desc: "Strategic pathways and challenges in dynamic natural settings.",
+    show_on_homepage: true
+  },
+  {
+    id: 3,
+    src: "https://images.unsplash.com/photo-1505142468610-359e7d316be0?q=80&w=2126&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    title: "Intellectual Sanctuary",
+    category: "Atelier Vibe",
+    aspect: "aspect-[4/3]",
+    desc: "Deep conversations, intellectual sparring, and strategizing in Irbid.",
+    show_on_homepage: true
+  },
+  {
+    id: 4,
+    src: "https://images.unsplash.com/photo-1482881497185-d4a9ddbe4151?q=80&w=1965&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    title: "Strategy Session Waves",
+    category: "Play Session",
+    aspect: "aspect-square",
+    desc: "Unforgettable campaign game nights engineered by our leading strategic minds.",
+    show_on_homepage: true
+  },
+  {
+    id: 5,
+    src: "https://plus.unsplash.com/premium_photo-1673264933212-d78737f38e48?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    title: "Tactile Camaraderie",
+    category: "Play Session",
+    aspect: "aspect-[3/4]",
+    desc: "Real board games, tangible encounters, and strategic growth.",
+    show_on_homepage: true
+  },
+  {
+    id: 6,
+    src: "https://plus.unsplash.com/premium_photo-1711434824963-ca894373272e?q=80&w=2030&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    title: "Sunset Reflection Speeches",
+    category: "Community",
+    aspect: "aspect-[4/3]",
+    desc: "Reflecting on our game tactics and planning the next campaign schedules.",
+    show_on_homepage: true
+  },
+  {
+    id: 7,
+    src: "https://plus.unsplash.com/premium_photo-1675705721263-0bbeec261c49?q=80&w=1940&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    title: "Campaign Battleground",
+    category: "Tournament",
+    aspect: "aspect-square",
+    desc: "The board is set, the timers are ticking, and the strategy unfolds.",
+    show_on_homepage: true
+  },
+  {
+    id: 8,
+    src: "https://images.unsplash.com/photo-1524799526615-766a9833dec0?q=80&w=1935&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    title: "Atelier Nightfall Spark",
+    category: "Atelier Vibe",
+    aspect: "aspect-[3/4]",
+    desc: "Late night tactical sparring accompanied by warm cup of coffee.",
+    show_on_homepage: true
+  }
+];
 
 const ASPECT_OPTIONS = ['aspect-[3/4]', 'aspect-square', 'aspect-[4/3]'];
 

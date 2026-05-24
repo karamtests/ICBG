@@ -278,7 +278,7 @@ export default function App() {
           }));
           setGalleryImages(mapped);
         } else {
-          setGalleryImages([]);
+          setGalleryImages(DEFAULT_IMAGES);
         }
       }
     } catch (e) {
