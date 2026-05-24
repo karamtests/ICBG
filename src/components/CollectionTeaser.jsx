@@ -46,10 +46,51 @@ const TEASER_GAMES = [
   }
 ];
 
-export default function CollectionTeaser({ onNavigateToFullCollection }) {
+export default function CollectionTeaser({ games = [], onNavigateToFullCollection }) {
   const handleCardClick = () => {
     if (onNavigateToFullCollection) onNavigateToFullCollection();
   };
+
+  const handleImageError = (e, title) => {
+    e.target.style.display = 'none';
+    const parent = e.target.parentNode;
+    if (parent && !parent.querySelector('.img-fallback')) {
+      const fallback = document.createElement('div');
+      fallback.className = 'img-fallback w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-[#3a1d42]/40 to-[#25102a]/20 border border-[#f8b146]/35 text-[#f8b146] font-mono text-center p-4 rounded-[1.5rem]';
+      
+      const initials = title
+        .split(' ')
+        .slice(0, 2)
+        .map(w => w[0])
+        .join('')
+        .toUpperCase();
+        
+      fallback.innerHTML = `
+        <span class="text-2xl font-black tracking-widest mb-1 text-white">${initials}</span>
+        <span class="text-[8px] uppercase tracking-wider opacity-60 text-[#C8B1CC]">No Box Shot</span>
+      `;
+      parent.appendChild(fallback);
+    }
+  };
+
+  // Resolve dynamic values from the active merged games list
+  const activeTeaserGames = TEASER_GAMES.map(teaserGame => {
+    const liveGame = games.find(g => 
+      (g.title && g.title.toLowerCase() === teaserGame.title.toLowerCase()) ||
+      (g.num && String(g.num) === String(teaserGame.num))
+    );
+    if (liveGame) {
+      return {
+        ...teaserGame,
+        box_img: liveGame.box_img || liveGame.play_img || teaserGame.box_img,
+        players: liveGame.players ? (String(liveGame.players).toLowerCase().includes('player') ? liveGame.players : `${liveGame.players} Players`) : teaserGame.players,
+        time: liveGame.time ? liveGame.time : teaserGame.time,
+        // If theme or tagline gets customized in the db, we can use them as fallback overrides
+        tagline: liveGame.theme || teaserGame.tagline
+      };
+    }
+    return teaserGame;
+  });
 
   return (
     <section 
@@ -87,7 +128,7 @@ export default function CollectionTeaser({ onNavigateToFullCollection }) {
 
         {/* Dynamic Teaser Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 mb-16">
-          {TEASER_GAMES.map((game, index) => {
+          {activeTeaserGames.map((game, index) => {
             return (
               <div
                 key={game.title}
@@ -105,6 +146,7 @@ export default function CollectionTeaser({ onNavigateToFullCollection }) {
                     <img
                       src={game.box_img}
                       alt={game.title}
+                      onError={(e) => handleImageError(e, game.title)}
                       className="w-full h-full object-contain filter drop-shadow-md transition-transform duration-500 group-hover:scale-105"
                       loading="lazy"
                     />

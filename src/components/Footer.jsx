@@ -41,15 +41,15 @@ export default function Footer({ onTriggerJenga, onOpenDisputes }) {
             <div className="flex items-center gap-2.5 mb-6 group cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
               <img 
                 src="/assets/images/IBGC logos.svg" 
-                alt="ICBG Logo" 
+                alt="IBGC Logo" 
                 className="w-12 h-12 object-contain filter drop-shadow-[0_0_12px_rgba(248,177,70,0.15)] group-hover:scale-105 transition-transform duration-300"
               />
               <span className="font-sans font-black text-lg tracking-widest text-white">
-                ICBG<span className="text-[#f8b146]">.</span>
+                IBGC<span className="text-[#f8b146]">.</span>
               </span>
             </div>
             <p className="font-sans font-light text-sm text-[#C8B1CC] max-w-sm leading-relaxed mb-6">
-              The Irbid Community for Board Games (ICBG) is a private members' strategic gaming club. We blend high-end strategic board gaming with genuine community encounters.
+              The Irbid Board Games Community (IBGC) is a private members' strategic gaming club. We blend high-end strategic board gaming with genuine community encounters.
             </p>
             <div className="flex items-center gap-2 text-xs font-mono text-[#C8B1CC]/70">
               <MapPin size={12} className="text-[#f8b146]" />
@@ -120,7 +120,7 @@ export default function Footer({ onTriggerJenga, onOpenDisputes }) {
           {/* Copyrights */}
           <div className="flex flex-col md:flex-row items-center gap-4 text-xs font-mono text-[#C8B1CC]/50">
             <span>
-              © {currentYear} <span onClick={onOpenDisputes} className="cursor-pointer hover:text-[#f8b146] hover:underline transition-colors duration-300" title="Appeal to the Supreme Disputes Court! ⚖️">ICBG Atelier</span>. Est. <span onClick={handleJengaClick} className="cursor-pointer hover:text-[#f8b146] border-b border-dotted border-[#f8b146]/45 hover:border-[#f8b146] font-semibold transition-all duration-300 select-none">1983</span>. All rights reserved.
+              © {currentYear} <span onClick={onOpenDisputes} className="cursor-pointer hover:text-[#f8b146] hover:underline transition-colors duration-300" title="Appeal to the Supreme Disputes Court! ⚖️">IBGC Atelier</span>. Est. <span onClick={handleJengaClick} className="cursor-pointer hover:text-[#f8b146] border-b border-dotted border-[#f8b146]/45 hover:border-[#f8b146] font-semibold transition-all duration-300 select-none">1983</span>. All rights reserved.
             </span>
             <span className="hidden md:inline text-white/10">|</span>
             <span className="flex items-center gap-1 text-white">

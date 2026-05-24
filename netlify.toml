@@ -1,4 +1,4 @@
-# Netlify Deployment Configuration for ICBG
+# Netlify Deployment Configuration for IBGC
 # Automates the build and folder routing settings directly from your GitHub repository.
 
 [build]

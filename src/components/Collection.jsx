@@ -18,21 +18,21 @@ const GameCard = React.memo(function GameCard({ game, index, getCleanLink, handl
       return {
         subtitle: "Est. 1995 By Klaus Teuber",
         note: "In 1995, Klaus Teuber designed Catan on his basement table, introducing the world to modern Eurogaming. Today, over 40 million strategists still ask the timeless, desperate question: 'Does anyone have wood for sheep?'",
-        joke: "ICBG Community lore dictates that trading 4 sheep, 2 wheat, and your dignity for a single brick road is perfectly acceptable—only to be targeted by the Robber on the very next turn."
+        joke: "IBGC Community lore dictates that trading 4 sheep, 2 wheat, and your dignity for a single brick road is perfectly acceptable—only to be targeted by the Robber on the very next turn."
       };
     }
     if (game.title === 'Chess') {
       return {
         subtitle: "Ancient Indian Chaturanga Refinement",
         note: "The legendary game of kings, refined over 1,500 years. Simple rules, infinite tactical complexity. As Grandmasters say: 'Every pawn is a potential queen, but even a king can fall from a single moment of lost focus.'",
-        joke: "ICBG Rule #24: If you blunder your Queen in the first 5 moves, do not panic. Simply state with absolute confidence that it was a highly advanced 'grandmaster gambit' to psych out your opponent."
+        joke: "IBGC Rule #24: If you blunder your Queen in the first 5 moves, do not panic. Simply state with absolute confidence that it was a highly advanced 'grandmaster gambit' to psych out your opponent."
       };
     }
     if (game.title === 'Dixit') {
       return {
         subtitle: "2008 Jean-Louis Roubira masterpiece",
         note: "Dixit proved that strategic gameplay can be built on abstract dreaming and subjective visual metaphors rather than raw math. Beautiful, surreal cards prompt players to think like poets and psychologists.",
-        joke: "ICBG Rule #12: If you describe your card as 'An existential feeling of quiet desperation' and everyone matches it instantly, you lose your mind and your points."
+        joke: "IBGC Rule #12: If you describe your card as 'An existential feeling of quiet desperation' and everyone matches it instantly, you lose your mind and your points."
       };
     }
     if (game.title === 'Secret Hitler') {
@@ -53,7 +53,7 @@ const GameCard = React.memo(function GameCard({ game, index, getCleanLink, handl
       return {
         subtitle: "2018 Wolfgang Warsch Telepathy Test",
         note: "An experimental card game where players must discard cards in ascending order without communicating. It asks: can a board game create a shared subconscious rhythm?",
-        joke: "ICBG Rule #45: Staring into your partner's eyes for two minutes to sync your breathing is highly encouraged. Accidental telepathic screaming is, however, strictly prohibited."
+        joke: "IBGC Rule #45: Staring into your partner's eyes for two minutes to sync your breathing is highly encouraged. Accidental telepathic screaming is, however, strictly prohibited."
       };
     }
     return null;

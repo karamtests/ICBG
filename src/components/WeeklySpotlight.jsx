@@ -107,7 +107,7 @@ export default function WeeklySpotlight({ schedule, games, onScrollToCollection 
               {/* Action Buttons */}
               <div className="mt-10 space-y-3">
                 <a
-                  href="https://chat.whatsapp.com/ICBG" 
+                  href="https://chat.whatsapp.com/IBGC" 
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-full flex items-center justify-center gap-2 group/btn px-6 py-4 bg-gradient-to-r from-[#f8b146] to-[#f28a75] text-[#3a1d42] rounded-full font-sans font-bold text-xs uppercase tracking-widest shadow-md shadow-[#f8b146]/15 hover:scale-[1.02] hover:shadow-[0_8px_30px_rgba(248,177,70,0.3)] transition-all duration-300"

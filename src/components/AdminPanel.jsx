@@ -202,7 +202,7 @@ export default function AdminPanel({ isOpen, onClose, games, onAddGame, onUpdate
 
       // Fallback
       try {
-        const stored = localStorage.getItem('icbg_applications');
+        const stored = localStorage.getItem('ibgc_applications');
         setApplicantsList(stored ? JSON.parse(stored) : []);
       } catch (e) {
         console.warn("Failed to parse applications from localStorage:", e);
@@ -397,7 +397,7 @@ export default function AdminPanel({ isOpen, onClose, games, onAddGame, onUpdate
               {isAuthenticated ? <Unlock size={18} /> : <Lock size={18} />}
             </div>
             <div className="text-left">
-              <span className="font-mono text-[9px] uppercase tracking-[0.25em] text-[#f8b146] font-bold block">ICBG CLUB ATELIER</span>
+              <span className="font-mono text-[9px] uppercase tracking-[0.25em] text-[#f8b146] font-bold block">IBGC CLUB ATELIER</span>
               <h3 className="font-sans font-black text-xl text-white">Admin Control Center</h3>
             </div>
           </div>
@@ -418,7 +418,7 @@ export default function AdminPanel({ isOpen, onClose, games, onAddGame, onUpdate
             </div>
             <h4 className="font-sans font-bold text-lg text-white mb-2 text-center">Private Administration Portal</h4>
             <p className="font-sans font-light text-xs text-[#C8B1CC] text-center max-w-sm mb-8 leading-relaxed">
-              Please enter the secret passcode of Irbid Community for Board Games (ICBG) to unlock administrative controls.
+              Please enter the secret passcode of Irbid Board Games Community (IBGC) to unlock administrative controls.
             </p>
 
             <form onSubmit={handleAuthSubmit} className="w-full max-w-xs flex flex-col items-center">
@@ -1421,7 +1421,7 @@ export default function AdminPanel({ isOpen, onClose, games, onAddGame, onUpdate
                       <button
                         onClick={async () => {
                           if (confirm("Are you sure you want to clear all applications?")) {
-                            localStorage.removeItem('icbg_applications');
+                            localStorage.removeItem('ibgc_applications');
                             setApplicantsList([]);
                             setFormSuccess('All applications cleared successfully.');
                             setTimeout(() => setFormSuccess(''), 3000);
@@ -1475,7 +1475,7 @@ export default function AdminPanel({ isOpen, onClose, games, onAddGame, onUpdate
                           <button
                             onClick={async () => {
                               const updated = applicantsList.filter(item => item.id !== app.id);
-                              localStorage.setItem('icbg_applications', JSON.stringify(updated));
+                              localStorage.setItem('ibgc_applications', JSON.stringify(updated));
                               setApplicantsList(updated);
                               setFormSuccess(`Removed application from "${app.fullName}"`);
                               setTimeout(() => setFormSuccess(''), 3000);

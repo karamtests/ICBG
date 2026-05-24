@@ -70,7 +70,7 @@ export default function DisputesCourt({ isOpen, onClose }) {
         {/* Decorative corner decals */}
         <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-[#f8b146]/10 to-transparent pointer-events-none rounded-tr-[2.5rem]" />
         <div className="absolute top-4 left-6 font-mono text-[9px] text-[#f8b146]/45 flex items-center gap-1.5">
-          <Scale size={11} /> ICBG SUPREME COURT
+          <Scale size={11} /> IBGC SUPREME COURT
         </div>
 
         {/* Close Button */}
@@ -182,7 +182,7 @@ export default function DisputesCourt({ isOpen, onClose }) {
                 <span className="font-serif italic text-[9px] text-[#f28a75]">
                   {currentRuling.precedent}
                 </span>
-                <span className="font-mono text-[7px] text-[#C8B1CC]/40 font-bold">ICBG SUPREME COURT</span>
+                <span className="font-mono text-[7px] text-[#C8B1CC]/40 font-bold">IBGC SUPREME COURT</span>
               </div>
             </div>
           ) : (

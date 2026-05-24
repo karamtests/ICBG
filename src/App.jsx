@@ -194,7 +194,7 @@ export default function App() {
           }));
           setExtraGames(mapped);
           try {
-            localStorage.setItem('icbg_extra_games', JSON.stringify(mapped));
+            localStorage.setItem('ibgc_extra_games', JSON.stringify(mapped));
           } catch (e) {
             console.warn("Failed to sync extra games to localStorage:", e);
           }
@@ -207,7 +207,7 @@ export default function App() {
 
     // Fallback to localStorage if Supabase is offline/unconfigured
     try {
-      const stored = localStorage.getItem('icbg_extra_games');
+      const stored = localStorage.getItem('ibgc_extra_games');
       if (stored) {
         setExtraGames(JSON.parse(stored));
       }
@@ -237,17 +237,21 @@ export default function App() {
     try {
       const { data, error } = await supabase.from('gallery_images').select('*').order('created_at', { ascending: true });
       if (error) throw error;
-      if (data && data.length > 0) {
-        // Map database naming back to React keys
-        const mapped = data.map(item => ({
-          id: item.id,
-          src: item.src,
-          title: item.title,
-          category: item.category,
-          aspect: item.aspect,
-          desc: item.description
-        }));
-        setGalleryImages(mapped);
+      if (data) {
+        if (data.length > 0) {
+          // Map database naming back to React keys
+          const mapped = data.map(item => ({
+            id: item.id,
+            src: item.src,
+            title: item.title,
+            category: item.category,
+            aspect: item.aspect,
+            desc: item.description
+          }));
+          setGalleryImages(mapped);
+        } else {
+          setGalleryImages([]);
+        }
       }
     } catch (e) {
       console.warn("Failed to fetch gallery from Supabase, falling back to local storage:", e);
@@ -324,7 +328,7 @@ export default function App() {
     setExtraGames(updated);
 
     try {
-      localStorage.setItem('icbg_extra_games', JSON.stringify(updated));
+      localStorage.setItem('ibgc_extra_games', JSON.stringify(updated));
     } catch (e) {
       console.warn("Failed to cache games in localStorage:", e);
     }
@@ -377,7 +381,7 @@ export default function App() {
     setExtraGames(updated);
 
     try {
-      localStorage.setItem('icbg_extra_games', JSON.stringify(updated));
+      localStorage.setItem('ibgc_extra_games', JSON.stringify(updated));
     } catch (e) {
       console.warn("Failed to cache games in localStorage:", e);
     }
@@ -596,7 +600,10 @@ export default function App() {
             />
 
             {/* Curated Collection Preview (Teaser Showcase) */}
-            <CollectionTeaser onNavigateToFullCollection={handleScrollToCollection} />
+            <CollectionTeaser 
+              games={allGames} 
+              onNavigateToFullCollection={handleScrollToCollection} 
+            />
 
             {/* Captured Moments (Gallery) */}
             <Gallery images={galleryImages} />

@@ -117,13 +117,13 @@ export default function Navbar({ onOpenAdmin, currentView }) {
       >
         <img 
           src="/assets/images/IBGC logos.svg" 
-          alt="ICBG Logo" 
+          alt="IBGC Logo" 
           className={`w-10 h-10 object-contain filter drop-shadow-[0_0_8px_rgba(201,168,76,0.25)] transition-all duration-300 ${
             isSpinning ? 'logo-die-spin' : 'group-hover:scale-105'
           }`}
         />
         <span className="font-sans font-black text-lg tracking-widest text-white group-hover:text-[#f8b146] transition-colors duration-300">
-          ICBG<span className="text-[#f8b146]">.</span>
+          IBGC<span className="text-[#f8b146]">.</span>
         </span>
       </div>
 

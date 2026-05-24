@@ -6,14 +6,14 @@ const CHANCE_CARDS = [
     title: "THE RULE LAWYER",
     subtitle: "Strategic Infraction Detector",
     description: "You spent 45 minutes reading BoardGameGeek forums during an active turn to prove a minor technical point.",
-    quote: "ICBG Community Rule #12: Diagonal movement is technically undefined on hexagonal grids unless you bribe the banker.",
+    quote: "IBGC Community Rule #12: Diagonal movement is technically undefined on hexagonal grids unless you bribe the banker.",
     badge: "0 Respect, +1 Argument"
   },
   {
     title: "ANALYSIS PARALYSIS",
     subtitle: "The Infinite Thinker",
     description: "You have been calculating optimal moves since 2024. The stars have aligned, empires have fallen, and the coffee is ice-cold.",
-    quote: "ICBG Rule #72: Players experiencing AP will be gently synchronized with a ticking egg-timer of ultimate doom.",
+    quote: "IBGC Rule #72: Players experiencing AP will be gently synchronized with a ticking egg-timer of ultimate doom.",
     badge: "Cold Coffee, 0 Moves"
   },
   {
@@ -27,7 +27,7 @@ const CHANCE_CARDS = [
     title: "THE KINGMAKER",
     subtitle: "Snack-Driven Strategy",
     description: "You realize you cannot win, so you deliberately pivot your entire turn to hand victory to the player who brought the snacks.",
-    quote: "ICBG Rule #5: The person who brought the gourmet pistachios is legally immune to target-focused attacks.",
+    quote: "IBGC Rule #5: The person who brought the gourmet pistachios is legally immune to target-focused attacks.",
     badge: "+10 Snack Champion"
   },
   {
@@ -257,7 +257,7 @@ export default function DeckOfDestiny() {
                         {currentCard.badge}
                       </span>
                     </div>
-                    <span className="font-mono text-[8px] text-[#C8B1CC]/30 font-bold">ICBG ATELIER</span>
+                    <span className="font-mono text-[8px] text-[#C8B1CC]/30 font-bold">IBGC ATELIER</span>
                   </div>
 
                 </div>

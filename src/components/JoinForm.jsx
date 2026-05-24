@@ -145,7 +145,7 @@ export default function JoinForm() {
     setTimeout(async () => {
       // Local fallback persistent write
       try {
-        const stored = localStorage.getItem('icbg_applications');
+        const stored = localStorage.getItem('ibgc_applications');
         const list = stored ? JSON.parse(stored) : [];
         const newApplication = {
           id: Date.now(),
@@ -156,7 +156,7 @@ export default function JoinForm() {
           date: new Date().toISOString()
         };
         list.push(newApplication);
-        localStorage.setItem('icbg_applications', JSON.stringify(list));
+        localStorage.setItem('ibgc_applications', JSON.stringify(list));
       } catch (error) {
         console.warn("Failed to save application to localStorage:", error);
       }
