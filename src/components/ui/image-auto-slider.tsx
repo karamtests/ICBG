@@ -45,7 +45,7 @@ export const Component: React.FC<ImageAutoSliderProps> = ({ images: propImages, 
         }
 
         .infinite-scroll {
-          animation: scroll-right 20s linear infinite;
+          animation: scroll-right 90s linear infinite;
         }
 
         .scroll-container {

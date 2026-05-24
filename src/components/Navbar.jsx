@@ -37,7 +37,7 @@ export default function Navbar({ onOpenAdmin, currentView, schedule }) {
   }, []);
 
   const handleLogoClick = () => {
-    if (currentView === 'collection') {
+    if (currentView === 'collection' || currentView === 'gallery') {
       window.location.hash = '#/';
     } else {
       window.scrollTo({ top: 0, behavior: 'smooth' });
