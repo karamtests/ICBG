@@ -30,6 +30,91 @@ const DEFAULT_SCHEDULE = {
   locationLink: "https://maps.app.goo.gl/R6WFBay7Piyfoe1w9?g_st=ic"
 };
 
+// Helper to automate the schedule dates dynamically based on configured times
+function getAutomatedSchedule(sched) {
+  if (!sched) return sched;
+
+  // Helper to extract time from string (e.g. "28/5/26 7:45 PM" -> "7:45 PM")
+  const extractTime = (str, defaultTime) => {
+    if (!str) return defaultTime;
+    const match = str.match(/(\d{1,2}:\d{2}\s*(?:AM|PM))/i);
+    return match ? match[1] : str;
+  };
+
+  const thursdayTime = extractTime(sched.thursdayDate, "7:45 PM");
+  const fridayTime = extractTime(sched.fridayDate, "7:45 PM");
+  const mainTime = extractTime(sched.nextHangout, "7:00 PM");
+
+  // Helper to get upcoming day of week (4 = Thursday, 5 = Friday)
+  const getUpcomingDate = (targetDay, timeStr) => {
+    const now = new Date();
+    
+    let targetHours = 19;
+    let targetMinutes = 0;
+    if (timeStr) {
+      const match = timeStr.match(/(\d+):(\d+)\s*(AM|PM)/i);
+      if (match) {
+        let hours = parseInt(match[1], 10);
+        const minutes = parseInt(match[2], 10);
+        const ampm = match[3].toUpperCase();
+        if (ampm === 'PM' && hours < 12) hours += 12;
+        if (ampm === 'AM' && hours === 12) hours = 0;
+        targetHours = hours;
+        targetMinutes = minutes;
+      }
+    }
+
+    const targetDate = new Date(now);
+    targetDate.setHours(targetHours, targetMinutes, 0, 0);
+
+    const currentDay = now.getDay();
+    let daysToAdd = (targetDay - currentDay + 7) % 7;
+
+    // Rollover: 3 hours grace period after the session starts
+    const rolloverDate = new Date(targetDate);
+    rolloverDate.setHours(targetHours + 3);
+
+    if (daysToAdd === 0 && now > rolloverDate) {
+      daysToAdd = 7;
+    }
+
+    const upcoming = new Date(now);
+    upcoming.setDate(now.getDate() + daysToAdd);
+    upcoming.setHours(targetHours, targetMinutes, 0, 0);
+    return upcoming;
+  };
+
+  const upcomingThu = getUpcomingDate(4, thursdayTime);
+  const upcomingFri = getUpcomingDate(5, fridayTime);
+
+  // Compare which one is sooner
+  const isThuSooner = upcomingThu.getTime() < upcomingFri.getTime();
+  const nextHangoutDate = isThuSooner ? upcomingThu : upcomingFri;
+
+  // Format functions
+  const formatSessionDate = (date, timeStr) => {
+    const d = date.getDate();
+    const m = date.getMonth() + 1;
+    const y = String(date.getFullYear()).slice(-2);
+    return `${d}/${m}/${y} ${timeStr}`;
+  };
+
+  const formatMainDate = (date, timeStr) => {
+    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const dayName = days[date.getDay()];
+    const d = date.getDate();
+    const m = date.getMonth() + 1;
+    const y = date.getFullYear();
+    return `${dayName}, ${d}/${m}/${y} ${timeStr}`;
+  };
+
+  return {
+    ...sched,
+    thursdayDate: formatSessionDate(upcomingThu, thursdayTime),
+    fridayDate: formatSessionDate(upcomingFri, fridayTime),
+    nextHangout: formatMainDate(nextHangoutDate, mainTime)
+  };
+}
 
 export default function App() {
   // Easter Egg & Admin States
@@ -45,6 +130,11 @@ export default function App() {
 
   // Schedule state
   const [schedule, setSchedule] = useState(DEFAULT_SCHEDULE);
+
+  // Automated schedule memo
+  const automatedSchedule = React.useMemo(() => {
+    return getAutomatedSchedule(schedule);
+  }, [schedule]);
 
   // SPA Custom Routing State
   const [currentView, setCurrentView] = useState(() => {
@@ -684,7 +774,7 @@ export default function App() {
       }`} />
 
       {/* Floating Island Navigation */}
-      <Navbar onOpenAdmin={() => setIsAdminOpen(true)} currentView={currentView} schedule={schedule} />
+      <Navbar onOpenAdmin={() => setIsAdminOpen(true)} currentView={currentView} schedule={automatedSchedule} />
 
       {/* Main Experience sections */}
       <main>
@@ -776,7 +866,7 @@ export default function App() {
           /* Main Landing Page View */
           <>
             {/* The Opening Shot (Hero) */}
-            <Hero schedule={schedule} />
+            <Hero schedule={automatedSchedule} />
 
             {/* Infinite Auto-scrolling Gallery Slider */}
             <ImageAutoSlider 
@@ -785,11 +875,11 @@ export default function App() {
             />
 
             {/* The Manifesto (Philosophy) */}
-            <Philosophy onTriggerMeepleRain={() => setIsMeepleRainActive(true)} schedule={schedule} />
+            <Philosophy onTriggerMeepleRain={() => setIsMeepleRainActive(true)} schedule={automatedSchedule} />
 
             {/* Weekly Spotlight (Featured Campaign & Gathering Info) */}
             <WeeklySpotlight 
-              schedule={schedule} 
+              schedule={automatedSchedule} 
               games={allGames} 
               onScrollToCollection={handleScrollToCollection} 
             />
@@ -801,7 +891,7 @@ export default function App() {
       </main>
 
       {/* The Rounded Obsidian Footer */}
-      <Footer onTriggerJenga={() => setIsJengaActive(true)} onOpenDisputes={() => setIsDisputesOpen(true)} schedule={schedule} />
+      <Footer onTriggerJenga={() => setIsJengaActive(true)} onOpenDisputes={() => setIsDisputesOpen(true)} schedule={automatedSchedule} />
 
 
       {/* Jenga Easter Egg Component */}
@@ -833,7 +923,7 @@ export default function App() {
         games={allGames} 
         onAddGame={handleAddGame}
         onUpdateGame={handleUpdateGame}
-        schedule={schedule}
+        schedule={automatedSchedule}
         onUpdateSchedule={handleUpdateSchedule}
         galleryImages={galleryImages}
         onAddGalleryImage={handleAddGalleryImage}

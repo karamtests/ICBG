@@ -179,12 +179,19 @@ export default function AdminPanel({
     setEditingImageIndex(index);
   };
 
+  // Helper to extract time from string (e.g. "28/5/26 7:45 PM" -> "7:45 PM")
+  const extractTime = (str) => {
+    if (!str) return '';
+    const match = str.match(/(\d{1,2}:\d{2}\s*(?:AM|PM))/i);
+    return match ? match[1] : str;
+  };
+
   // Sync state with props when open, reset auth when closed
   useEffect(() => {
     if (isOpen) {
-      setNextHangout(schedule.nextHangout || '');
-      setThursdayDate(schedule.thursdayDate || '');
-      setFridayDate(schedule.fridayDate || '');
+      setNextHangout(extractTime(schedule.nextHangout) || '');
+      setThursdayDate(extractTime(schedule.thursdayDate) || '');
+      setFridayDate(extractTime(schedule.fridayDate) || '');
       setFeaturedTitles(schedule.featuredGameTitles || []);
       setLocationName(schedule.locationName || 'Cortina.D Cafe');
       setLocationLink(schedule.locationLink || 'https://maps.app.goo.gl/R6WFBay7Piyfoe1w9?g_st=ic');
@@ -597,12 +604,12 @@ export default function AdminPanel({
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
                       {/* Next Gathering Input */}
                       <div className="flex flex-col gap-2">
-                        <label className="font-mono text-[9px] uppercase tracking-wider text-[#C8B1CC]/80 font-bold">Main Gathering Title</label>
+                        <label className="font-mono text-[9px] uppercase tracking-wider text-[#C8B1CC]/80 font-bold">Main Gathering Time (Date Auto-Calculated)</label>
                         <input
                           type="text"
                           value={nextHangout}
                           onChange={(e) => setNextHangout(e.target.value)}
-                          placeholder="e.g. Friday, 22/5/2026 7:30 PM"
+                          placeholder="e.g. 7:00 PM"
                           className="py-3 px-4 bg-[#120515]/50 border border-white/10 hover:border-white/20 focus:border-[#f8b146] rounded-xl font-sans text-xs text-white placeholder-white/30 focus:outline-none transition-all duration-300 focus:ring-1 focus:ring-[#f8b146]/20"
                           required
                         />
@@ -610,12 +617,12 @@ export default function AdminPanel({
 
                       {/* Thursday Date/Time Input */}
                       <div className="flex flex-col gap-2">
-                        <label className="font-mono text-[9px] uppercase tracking-wider text-[#C8B1CC]/80 font-bold">Thursday Session Time</label>
+                        <label className="font-mono text-[9px] uppercase tracking-wider text-[#C8B1CC]/80 font-bold">Thursday Session Time (Date Auto-Calculated)</label>
                         <input
                           type="text"
                           value={thursdayDate}
                           onChange={(e) => setThursdayDate(e.target.value)}
-                          placeholder="e.g. 28/5/26 7:00 PM"
+                          placeholder="e.g. 7:45 PM"
                           className="py-3 px-4 bg-[#120515]/50 border border-white/10 hover:border-white/20 focus:border-[#f8b146] rounded-xl font-sans text-xs text-white placeholder-white/30 focus:outline-none transition-all duration-300 focus:ring-1 focus:ring-[#f8b146]/20"
                           required
                         />
@@ -623,12 +630,12 @@ export default function AdminPanel({
 
                       {/* Friday Date/Time Input */}
                       <div className="flex flex-col gap-2">
-                        <label className="font-mono text-[9px] uppercase tracking-wider text-[#C8B1CC]/80 font-bold">Friday Session Time</label>
+                        <label className="font-mono text-[9px] uppercase tracking-wider text-[#C8B1CC]/80 font-bold">Friday Session Time (Date Auto-Calculated)</label>
                         <input
                           type="text"
                           value={fridayDate}
                           onChange={(e) => setFridayDate(e.target.value)}
-                          placeholder="e.g. 22/5/26 7:00 PM"
+                          placeholder="e.g. 7:45 PM"
                           className="py-3 px-4 bg-[#120515]/50 border border-white/10 hover:border-white/20 focus:border-[#f8b146] rounded-xl font-sans text-xs text-white placeholder-white/30 focus:outline-none transition-all duration-300 focus:ring-1 focus:ring-[#f8b146]/20"
                           required
                         />
